@@ -1,0 +1,2245 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  当代青年精神体检中心 v3.1 — Mental Checkup Center       ║
+  ║  2026 TRAE AI 创造力大赛 · 生活娱乐赛道                    ║
+  ║                                                              ║
+  ║  v3.1 更新：                                               ║
+  ║  · 修复 JS 语法错误导致点击无响应                          ║
+  ║  · 挂号页面调亮，视觉更清爽                                ║
+  ║  · 夜间模式深色适配                                        ║
+  ║  · 医生分组匹配（学生/打工人专属医生）                     ║
+  ║  · 页面切换加载动画                                        ║
+  ║  · 粒子特效增强（更明显的分级色调）                        ║
+  ║  · 分享卡片增强设计                                        ║
+  ║                                                              ║
+  ║  全程由 TRAE IDE 开发完成                                   ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>当代青年精神体检中心 v3.1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js">
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --brand-deep:#0a2540; --brand-blue:#0d4a7a; --brand-med:#1a6fb0; --brand-accent:#3b9ae0;
+  --brand-sky:#e1f1fc; --brand-light:#f4f9fd;
+  --paper:#ffffff; --paper-warm:#f7f9fc; --paper-dark:#eef2f7;
+  --ink:#1a1d23; --ink-med:#5a6472; --ink-light:#9aa3b0;
+  --stamp-red:#e63946; --stamp-pink:#fce8eb; --green-ok:#0a9d58; --green-light:#e3f7ed;
+  --orange-warn:#e8830c; --orange-light:#fef5e7;
+  --student-warm:#ff6b4a; --student-light:#fff0ed; --worker-cool:#2b7fd4; --worker-light:#e8f3fc;
+  --divider:#e2e6ec; --divider-light:#eef1f5;
+  --shadow-sm:0 1px 3px rgba(10,37,64,.04); --shadow-md:0 4px 20px rgba(10,37,64,.06);
+  --shadow-lg:0 12px 40px rgba(10,37,64,.10);
+  --font-sans:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-serif:"Noto Serif SC","Songti SC","SimSun",serif;
+  --font-mono:"Space Mono","SF Mono","Consolas",monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-spring:cubic-bezier(.175,.885,.32,1.275);
+  --ease-smooth:cubic-bezier(.4,0,.2,1);
+  --radius-sm:8px; --radius-md:14px; --radius-lg:20px;
+  --reg-bg-start:#0a2540; --reg-bg-mid:#0d4a7a; --reg-bg-end:#1a7ab8;
+  --reg-card-bg:rgba(255,255,255,.08);
+}
+
+/* 夜间模式 */
+body.dark {
+  --paper:#161a21; --paper-warm:#1e222b; --paper-dark:#262b35;
+  --ink:#e8eaed; --ink-med:#a0a8b4; --ink-light:#6b7280;
+  --divider:#2d3340; --divider-light:#252a33;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.2); --shadow-md:0 4px 20px rgba(0,0,0,.3);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.4);
+  --student-light:#2a1810; --worker-light:#0d1f35;
+  --stamp-pink:#2a1218; --green-light:#0d1f15; --orange-light:#2a1f0d;
+  --brand-sky:#0d1f35; --brand-light:#121821;
+  background:#0d0f13;
+}
+body.dark .app{background:var(--paper);}
+body.dark .option-btn{background:var(--paper-warm);}
+body.dark .option-btn.selected{background:linear-gradient(135deg,#0d2a45 0%,#0d3a60 100%);border-color:var(--brand-accent);}
+body.dark .report-doc{background:var(--paper-warm);}
+body.dark .presc-doc{background:var(--paper-warm);}
+body.dark .score-explain{background:var(--paper-dark);}
+body.dark .dr-note{background:linear-gradient(135deg,#2a2410,#2a2012);border-color:rgba(232,131,12,.3);}
+body.dark .diag-block{background:linear-gradient(135deg,#3a1a20,#2a1820);border-left-color:var(--stamp-red);box-shadow:0 2px 8px rgba(0,0,0,.2);}
+body.dark .info-grid .info-cell{background:var(--paper-warm);}
+body.dark .share-card{background:var(--paper-warm);color:var(--ink);}
+body.dark .reg-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06);}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:var(--font-sans);background:#e8ecf0;
+  color:var(--ink);font-size:15px;line-height:1.7;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;
+  transition:background .4s,color .4s;
+}
+.app{
+  max-width:480px;margin:0 auto;min-height:100svh;position:relative;background:var(--paper);
+  box-shadow:0 0 0 1px rgba(10,37,64,.04),0 8px 40px rgba(10,37,64,.08);
+  transition:background .4s;
+}
+.screen{
+  position:absolute;top:0;left:0;width:100%;min-height:100svh;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;overflow:hidden;transform:translateY(12px);
+  transition:opacity .45s var(--ease-out),transform .45s var(--ease-out);
+}
+.screen.active{opacity:1;pointer-events:auto;overflow-y:auto;transform:translateY(0);}
+
+/* 暗色模式切换按钮 */
+.dark-toggle{
+  position:fixed;bottom:20px;right:20px;z-index:900;width:44px;height:44px;
+  border-radius:50%;background:var(--paper-warm);border:1px solid var(--divider);
+  cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-md);transition:transform .2s,background .3s;
+}
+.dark-toggle:hover{transform:scale(1.08) rotate(10deg);box-shadow:var(--shadow-lg);}
+.dark-toggle:active{transform:scale(.95);}
+
+/* 加载动画 */
+.loading-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:950;
+  background:rgba(10,37,64,.88);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;
+}
+.loading-overlay.show{opacity:1;pointer-events:auto;}
+.loading-spinner{
+  width:44px;height:44px;border:3px solid rgba(255,255,255,.15);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{color:rgba(255,255,255,.6);font-size:13px;margin-top:14px;letter-spacing:.06em;}
+
+/* ═══════════ REGISTRATION — 3-STEP FLOW ═══════════ */
+.scr-register{
+  background:linear-gradient(170deg,var(--reg-bg-start) 0%,var(--reg-bg-mid) 30%,var(--reg-bg-end) 100%);
+  color:#fff;align-items:center;justify-content:center;text-align:center;padding:36px 24px 40px;
+  position:relative;overflow:hidden;
+}
+.scr-register::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:350px;height:350px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 70%);pointer-events:none;
+}
+.scr-register::after{
+  content:'';position:absolute;top:20%;right:-30%;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);pointer-events:none;
+}
+
+.reg-brand{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;margin-bottom:20px;}
+.reg-brand .cross-icon{
+  width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,.15);
+  backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  margin-bottom:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);
+}
+.reg-brand h1{font-family:var(--font-serif);font-size:24px;font-weight:900;letter-spacing:.06em;line-height:1.2;}
+.reg-brand .dept-name{font-size:11px;font-weight:500;opacity:.6;letter-spacing:.1em;margin-top:3px;}
+
+/* Progress Bar */
+.reg-progress{position:relative;z-index:1;width:100%;max-width:300px;display:flex;align-items:center;gap:0;margin-bottom:28px;}
+.reg-progress .prog-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+.reg-progress .prog-dot{
+  width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.25);
+  transition:all .4s var(--ease-out);position:relative;z-index:1;
+}
+.reg-progress .prog-dot.done{background:#fff;box-shadow:0 0 12px rgba(255,255,255,.5);}
+.reg-progress .prog-dot.active{background:#fff;box-shadow:0 0 16px rgba(255,255,255,.6);transform:scale(1.2);}
+.reg-progress .prog-line{
+  position:absolute;top:6px;left:calc(50% + 8px);width:calc(100% - 12px);
+  height:2px;background:rgba(255,255,255,.2);z-index:0;transition:background .4s;
+}
+.reg-progress .prog-line.done{background:#fff;}
+.reg-progress .prog-label{font-size:9px;opacity:.45;transition:opacity .4s;text-align:center;}
+.reg-progress .prog-label.active{opacity:1;color:#fff;font-weight:600;}
+
+/* Step Cards */
+.reg-step{position:relative;z-index:1;width:100%;display:none;flex-direction:column;align-items:center;}
+.reg-step.show{display:flex;animation:fadeInUp .4s var(--ease-out);}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.reg-card{
+  width:100%;background:rgba(255,255,255,.07);backdrop-filter:blur(20px) saturate(140%);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);
+  border-radius:var(--radius-lg);padding:26px 22px;
+  border:1px solid rgba(255,255,255,.08);text-align:left;
+  box-shadow:0 8px 32px rgba(10,37,64,.18),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.reg-card .card-icon-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.reg-card .card-icon{font-size:20px;}
+.reg-card .card-title{font-size:16px;font-weight:700;letter-spacing:.03em;}
+.reg-card .card-subtitle{font-size:10px;opacity:.5;margin-top:2px;}
+
+/* Step 1: Group */
+.group-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.group-card{
+  padding:20px 12px;border-radius:var(--radius-md);border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);
+  cursor:pointer;text-align:center;transition:all .35s var(--ease-out);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  box-shadow:0 2px 8px rgba(10,37,64,.1);
+}
+.group-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.1);box-shadow:0 8px 24px rgba(10,37,64,.2);}
+.group-card .gc-emoji{font-size:36px;transition:transform .4s var(--ease-spring);}
+.group-card:hover .gc-emoji{transform:scale(1.18) rotate(-3deg);}
+.group-card .gc-name{font-size:15px;font-weight:700;}
+.group-card .gc-desc{font-size:10px;opacity:.6;}
+.group-card.selected{
+  border-color:#fff;background:rgba(255,255,255,.16);color:#fff;
+  box-shadow:0 0 32px rgba(255,255,255,.12),0 8px 24px rgba(10,37,64,.2);transform:translateY(-3px);
+}
+.group-card.selected-student{border-color:var(--student-warm);background:rgba(224,123,90,.25);color:#fff;}
+.group-card.selected-worker{border-color:var(--worker-cool);background:rgba(59,111,182,.25);color:#fff;}
+
+/* Step 2: Sub-group */
+.sub-options{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.sub-option{
+  padding:14px 16px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);
+  cursor:pointer;text-align:left;transition:all .3s var(--ease-out);
+  display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;
+}
+.sub-option:hover{border-color:rgba(255,255,255,.35);transform:translateX(4px);background:rgba(255,255,255,.1);box-shadow:0 4px 12px rgba(10,37,64,.15);}
+.sub-option .so-emoji{font-size:22px;flex-shrink:0;}
+.sub-option .so-age{font-size:10px;opacity:.5;font-weight:400;}
+.sub-option.selected{border-color:#fff;background:rgba(255,255,255,.15);color:#fff;transform:translateX(2px);}
+.sub-option.selected-student{border-color:var(--student-warm);background:rgba(224,123,90,.2);color:#fff;}
+.sub-option.selected-worker{border-color:var(--worker-cool);background:rgba(59,111,182,.2);color:#fff;}
+
+/* Step 3: Name */
+.reg-card .field{margin-bottom:14px;}
+.reg-card .field label{display:block;font-size:10px;font-weight:600;opacity:.6;margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase;}
+.reg-card .field input{
+  width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-family:var(--font-sans);
+  outline:none;transition:border-color .25s var(--ease-out),background .25s var(--ease-out),box-shadow .25s;
+}
+.reg-card .field input:focus{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(255,255,255,.08);}
+.reg-card .field input::placeholder{color:rgba(255,255,255,.3);}
+
+/* Preschool tip */
+.preschool-tip{
+  display:none;margin-top:8px;padding:10px 14px;background:rgba(255,255,255,.1);
+  border-radius:10px;font-size:11px;opacity:.7;text-align:center;line-height:1.5;
+}
+.preschool-tip.show{display:block;animation:fadeInUp .4s var(--ease-out);}
+
+/* Nav buttons */
+.reg-nav{display:flex;gap:10px;width:100%;margin-top:16px;}
+.btn-reg{
+  flex:1;padding:15px;border-radius:var(--radius-md);border:none;font-size:15px;font-weight:700;
+  cursor:pointer;letter-spacing:.03em;transition:transform .2s var(--ease-out),box-shadow .2s var(--ease-out),background .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-reg:active{transform:scale(.97);}
+.btn-reg-primary{background:#fff;color:var(--reg-bg-start);box-shadow:0 6px 20px rgba(0,0,0,.18),0 2px 6px rgba(10,37,64,.1);}
+.btn-reg-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.22),0 4px 10px rgba(10,37,64,.15);}
+.btn-reg-secondary{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px);}
+.btn-reg-secondary:hover{background:rgba(255,255,255,.16);color:#fff;transform:translateY(-1px);}
+.btn-reg:disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
+
+.reg-disclaimer{position:relative;z-index:1;font-size:10px;opacity:.35;margin-top:20px;line-height:1.6;max-width:280px;text-align:center;}
+
+/* ═══════════ CONSULTATION ═══════════ */
+.scr-consult{background:var(--paper);}
+.consult-topbar{display:flex;align-items:center;gap:14px;padding:16px 20px;background:linear-gradient(135deg,var(--brand-blue) 0%,var(--brand-med) 100%);color:#fff;box-shadow:0 2px 12px rgba(10,37,64,.12);}
+.consult-topbar .btn-back{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;opacity:.7;padding:4px;transition:opacity .2s;}
+.consult-topbar .btn-back:hover{opacity:1;}
+.consult-topbar .step-meta{flex:1;}
+.consult-topbar .step-label{font-size:9px;opacity:.5;letter-spacing:.1em;margin-bottom:2px;}
+.consult-topbar .step-title{font-size:14px;font-weight:700;letter-spacing:.02em;}
+.consult-progress{height:4px;background:var(--divider-light);position:relative;overflow:hidden;}
+.consult-progress .fill{height:100%;background:linear-gradient(90deg,var(--brand-med),var(--brand-accent));transition:width .6s var(--ease-out);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(59,154,224,.4);}
+.heartbeat-bar{height:32px;overflow:hidden;position:relative;background:rgba(13,74,122,.02);display:flex;align-items:center;justify-content:center;}
+.heartbeat-bar svg{width:100%;height:36px;}
+.heartbeat-line{fill:none;stroke:var(--stamp-red);stroke-width:1.2;opacity:.18;transition:opacity .3s;}
+.consult-body{flex:1;padding:28px 24px;display:flex;flex-direction:column;justify-content:center;}
+.consult-body .q-number{font-family:var(--font-mono);font-size:44px;font-weight:700;color:var(--divider);line-height:1;margin-bottom:6px;transition:color .3s;letter-spacing:-.02em;}
+.consult-body .q-text{font-family:var(--font-serif);font-size:20px;font-weight:700;line-height:1.5;margin-bottom:26px;color:var(--ink);letter-spacing:.01em;}
+.consult-body .q-options{display:flex;flex-direction:column;gap:8px;}
+
+.option-btn{
+  padding:15px 16px;border-radius:var(--radius-md);border:1.5px solid var(--divider-light);background:var(--paper);
+  font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:all .3s var(--ease-out);
+  color:var(--ink);display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.option-btn:hover{border-color:var(--brand-accent);transform:translateX(4px);box-shadow:0 4px 16px rgba(59,154,224,.12);}
+.option-btn:active{transform:scale(.98);}
+.option-btn .opt-letter{
+  width:30px;height:30px;border-radius:50%;background:var(--divider-light);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  font-weight:800;color:var(--ink-med);flex-shrink:0;transition:all .3s var(--ease-out);position:relative;z-index:1;
+}
+.option-btn .opt-text{position:relative;z-index:1;flex:1;}
+.option-btn.selected{border-color:var(--brand-accent);background:linear-gradient(135deg,var(--brand-sky) 0%,#d4e4fa 100%);box-shadow:0 4px 16px rgba(59,154,224,.18);}
+.option-btn.selected .opt-letter{background:linear-gradient(135deg,var(--brand-med),var(--brand-accent));color:#fff;box-shadow:0 2px 8px rgba(26,111,176,.3);}
+
+/* Preschool wobble */
+.option-btn.preschool-opt .opt-letter{animation:wobble 2s ease-in-out infinite;}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+
+/* ═══════════ REPORT ═══════════ */
+.scr-report{background:var(--paper);overflow-y:auto;padding-bottom:16px;}
+.landscape-container{position:relative;width:100%;height:220px;overflow:hidden;margin:0;}
+.landscape-container canvas{display:block;width:100%!important;height:100%!important;}
+.landscape-overlay{
+  position:absolute;bottom:0;left:0;right:0;padding:16px 20px;
+  background:linear-gradient(transparent,rgba(10,37,64,.92));color:#fff;pointer-events:none;
+}
+.landscape-overlay .landscape-label{font-size:9px;opacity:.5;letter-spacing:.12em;margin-bottom:2px;}
+.landscape-overlay .landscape-title{font-family:var(--font-serif);font-size:16px;font-weight:700;}
+.landscape-overlay .landscape-desc{font-size:10px;opacity:.45;margin-top:2px;line-height:1.4;}
+
+.report-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;position:relative;}
+.rpt-header{
+  background:linear-gradient(135deg,var(--brand-blue) 0%,var(--brand-deep) 100%);color:#fff;
+  padding:22px 24px;text-align:center;position:relative;overflow:hidden;
+}
+.rpt-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--brand-accent),transparent);opacity:.7;}
+.rpt-header .rpt-hospital{font-family:var(--font-serif);font-size:19px;font-weight:900;letter-spacing:.08em;}
+.rpt-header .rpt-dept{font-size:10px;opacity:.6;margin-top:4px;letter-spacing:.1em;}
+.rpt-group-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 14px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:.04em;margin-top:8px;
+}
+.rpt-group-badge.badge-student{background:var(--student-light);color:var(--student-warm);}
+.rpt-group-badge.badge-worker{background:var(--worker-light);color:var(--worker-cool);}
+
+.rpt-body{padding:24px;}
+.rpt-section{margin-bottom:22px;}
+.rpt-section:last-child{margin-bottom:0;}
+.rpt-section-title{
+  font-family:var(--font-serif);font-size:16px;font-weight:700;border-bottom:2px solid var(--ink);
+  padding-bottom:8px;margin-bottom:14px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;
+}
+.rpt-section-title::before{content:'';width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,var(--brand-med),var(--brand-accent));flex-shrink:0;box-shadow:0 0 6px rgba(59,154,224,.3);}
+
+.rpt-persona-section{
+  position:relative;overflow:hidden;border-radius:12px;margin:16px 0;
+  background:var(--paper-warm);
+}
+.rpt-persona-section .bg-img{
+  position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;
+}
+.rpt-persona-section .bg-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.88) 0%,rgba(255,255,255,.80) 50%,rgba(255,255,255,.90) 100%);
+}
+.rpt-persona-name{
+  position:relative;z-index:2;
+  font-size:22px;font-weight:900;font-family:var(--font-serif);
+  margin-bottom:6px;line-height:1.3;letter-spacing:.03em;
+  background:linear-gradient(135deg,var(--brand-deep),var(--brand-med),var(--brand-accent));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--brand-deep);
+}
+.rpt-persona-desc{
+  position:relative;z-index:2;
+  font-size:13px;color:var(--ink-med);margin-bottom:12px;max-width:280px;margin-left:auto;margin-right:auto;line-height:1.7;
+}
+
+.score-explain{
+  background:var(--paper-warm);border:1px solid var(--divider-light);border-radius:var(--radius-sm);
+  padding:14px 16px;margin-bottom:18px;font-size:12px;color:var(--ink-med);line-height:1.7;
+  cursor:pointer;transition:all .25s var(--ease-out);
+}
+.score-explain:hover{background:var(--paper-dark);border-color:var(--divider);box-shadow:var(--shadow-sm);}
+.score-explain .explain-header{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.score-explain .explain-body{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--divider-light);}
+.score-explain.open .explain-body{display:block;}
+
+.info-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;
+}
+.info-grid .info-cell{padding:14px 16px;border-radius:var(--radius-sm);background:var(--paper-warm);border:1px solid var(--divider-light);transition:all .25s var(--ease-out);}
+.info-grid .info-cell:hover{background:var(--paper-dark);border-color:var(--divider);}
+.info-grid .info-cell .info-label{font-size:10px;font-weight:600;color:var(--ink-light);letter-spacing:.06em;margin-bottom:2px;text-transform:uppercase;}
+.info-grid .info-cell .info-value{font-weight:700;font-size:15px;color:var(--ink);}
+
+.peer-compare{
+  background:linear-gradient(135deg,var(--paper-warm),var(--paper));border:1px solid var(--divider-light);
+  border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px;font-size:12px;
+}
+.peer-compare .peer-header{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.peer-compare .peer-stat{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dotted var(--divider-light);}
+.peer-compare .peer-stat:last-child{border-bottom:none;}
+.peer-compare .peer-label{color:var(--ink-med);}
+.peer-compare .peer-value{font-weight:700;}
+
+.indicator-block{margin-bottom:16px;}
+.indicator-block:last-child{margin-bottom:0;}
+.indicator-block .ind-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;}
+.indicator-block .ind-name{font-weight:700;font-size:13px;color:var(--ink);}
+.indicator-block .ind-score{font-family:var(--font-mono);font-size:12px;font-weight:700;}
+.indicator-block .ind-bar{height:8px;background:var(--divider-light);border-radius:4px;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(10,37,64,.04);}
+.indicator-block .ind-fill{height:100%;border-radius:4px;transition:width 1.2s var(--ease-spring);position:relative;box-shadow:0 1px 3px rgba(10,37,64,.1);}
+.indicator-block .ind-desc{font-size:10px;color:var(--ink-light);margin-top:3px;}
+
+.fill-danger{background:linear-gradient(90deg,var(--stamp-red),#e8505b);}
+.fill-warning{background:linear-gradient(90deg,var(--orange-warn),#f59e0b);}
+.fill-normal{background:linear-gradient(90deg,var(--brand-med),var(--brand-accent));}
+.fill-ok{background:linear-gradient(90deg,var(--green-ok),#22c55e);}
+.text-danger{color:var(--stamp-red);}
+.text-warning{color:var(--orange-warn);}
+.text-normal{color:var(--brand-med);}
+.text-ok{color:var(--green-ok);}
+
+.diag-block{
+  background:linear-gradient(135deg,var(--stamp-pink) 0%,#fff5f6 100%);border-left:3px solid var(--stamp-red);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 20px;margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(230,57,70,.06);
+}
+.diag-block .diag-label{font-size:9px;font-weight:800;color:var(--stamp-red);letter-spacing:.14em;margin-bottom:6px;}
+.diag-block .diag-text{font-family:var(--font-serif);font-size:15px;font-weight:600;line-height:1.7;color:var(--ink);}
+
+.dr-note{
+  margin-top:10px;padding:14px 16px;background:linear-gradient(135deg,#fffdf0 0%,#fff9e6 100%);
+  border:1px dashed rgba(232,131,12,.4);border-radius:var(--radius-sm);position:relative;
+  box-shadow:0 2px 8px rgba(232,131,12,.05);
+}
+.dr-note .dr-note-label{font-size:9px;font-weight:800;color:var(--orange-warn);letter-spacing:.1em;margin-bottom:4px;}
+.dr-note .dr-note-text{font-size:12px;color:var(--ink-med);line-height:1.6;font-style:italic;}
+
+.easter-egg-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 20px;
+  background:linear-gradient(135deg,#fef3c7,#fde68a,#fbbf24);border:2px solid #f59e0b;
+  border-radius:24px;font-size:14px;font-weight:900;color:#92400e;
+  letter-spacing:.06em;margin:12px 0;box-shadow:0 4px 20px rgba(245,158,11,.4);
+  animation:eggReveal .6s var(--ease-spring), eggGlow 2s ease-in-out .6s infinite;
+}
+.egg-confetti{
+  position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;
+  overflow:hidden;
+}
+.egg-confetti .confetti-piece{
+  position:absolute;width:8px;height:8px;border-radius:2px;
+  animation:confettiFall 2s ease-out forwards;
+}
+@keyframes eggReveal{
+  0%{transform:scale(0) rotate(-10deg);opacity:0}
+  60%{transform:scale(1.2) rotate(3deg);opacity:1}
+  100%{transform:scale(1) rotate(0deg);opacity:1}
+}
+@keyframes eggGlow{
+  0%,100%{box-shadow:0 4px 20px rgba(245,158,11,.4)}
+  50%{box-shadow:0 4px 30px rgba(245,158,11,.7),0 0 40px rgba(245,158,11,.3)}
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+.stamp.special{
+  border-color:rgba(245,158,11,.9);color:#92400e;
+  animation:stampDrop .5s var(--ease-spring) .3s both;
+  box-shadow:0 0 20px rgba(245,158,11,.3);
+}
+@keyframes stampDrop{
+  0%{transform:scale(3) rotate(-15deg);opacity:0}
+  60%{transform:scale(.9) rotate(2deg);opacity:1}
+  100%{transform:scale(1) rotate(0deg);opacity:1}
+}
+.report-card.shake{
+  animation:cardShake .5s ease-out;
+}
+@keyframes cardShake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-8px) rotate(-1deg)}
+  30%{transform:translateX(8px) rotate(1deg)}
+  45%{transform:translateX(-6px) rotate(-.5deg)}
+  60%{transform:translateX(6px) rotate(.5deg)}
+  75%{transform:translateX(-3px)}
+  90%{transform:translateX(3px)}
+}
+
+.stamp-wrap{text-align:center;padding:12px 0 8px;position:relative;}
+.stamp{
+  display:inline-block;border:3px solid rgba(196,30,58,.85);border-radius:50%;
+  padding:18px 14px;color:rgba(196,30,58,.85);font-family:var(--font-serif);
+  font-size:14px;font-weight:900;line-height:1.4;transform:rotate(-12deg);opacity:0;
+  animation:stampIn .6s .4s var(--ease-spring) forwards;
+  box-shadow:inset 0 0 0 1px rgba(196,30,58,.2);text-shadow:0 0 1px rgba(196,30,58,.3);
+  filter:drop-shadow(0 2px 4px rgba(196,30,58,.15));
+}
+@keyframes stampIn{0%{transform:rotate(-12deg) scale(3.5);opacity:0}70%{transform:rotate(-12deg) scale(.9);opacity:1}100%{transform:rotate(-12deg) scale(1);opacity:1}}
+
+
+
+/* ═══════════ PRESCRIPTION ═══════════ */
+.scr-presc{background:var(--paper);overflow-y:auto;padding-bottom:16px;}
+.presc-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;}
+.presc-body{padding:24px;}
+.rx-list{display:flex;flex-direction:column;gap:0;}
+.rx-row{display:flex;align-items:flex-start;gap:14px;padding:16px 12px;border-bottom:1px solid var(--divider-light);transition:all .25s var(--ease-out);border-radius:var(--radius-sm);}
+.rx-row:last-child{border-bottom:none;}
+.rx-row .rx-emoji{font-size:32px;flex-shrink:0;width:44px;text-align:center;transition:transform .4s var(--ease-spring);}
+.rx-row:hover{background:var(--paper-warm);}.rx-row:hover .rx-emoji{transform:scale(1.18) rotate(-6deg);}
+.rx-row .rx-detail{flex:1;}
+.rx-row .rx-name{font-weight:800;font-size:15px;color:var(--ink);}
+.rx-row .rx-dose{font-size:13px;font-weight:600;color:var(--brand-med);margin-top:3px;}
+.rx-row .rx-note{font-size:12px;color:var(--ink-light);margin-top:3px;line-height:1.5;}
+
+.rx-review{margin-top:12px;padding:14px 16px;background:var(--paper-warm);border:1px solid var(--divider-light);border-radius:var(--radius-sm);font-size:12px;color:var(--ink-med);line-height:1.6;}
+.rx-review .review-header{font-weight:700;font-size:13px;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+
+.rx-signature{margin-top:20px;padding-top:18px;border-top:2px solid var(--brand-blue);display:flex;justify-content:space-between;align-items:flex-end;}
+.rx-signature .sig-left{font-size:12px;color:var(--ink-light);}
+.rx-signature .sig-doctor{font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--ink);}
+.rx-signature .sig-scribble{font-family:"Brush Script MT","KaiTi","STKaiti",cursive;font-size:24px;color:var(--brand-med);margin-top:2px;}
+
+/* ═══════════ ACTION BAR ═══════════ */
+.action-bar{display:flex;gap:10px;padding:0 16px 20px;}
+.btn-action{
+  flex:1;padding:15px;border-radius:var(--radius-md);border:none;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.02em;transition:transform .2s var(--ease-out),box-shadow .2s var(--ease-out),background .2s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-action:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--brand-med),var(--brand-blue));color:#fff;box-shadow:0 4px 14px rgba(13,74,122,.25),0 2px 6px rgba(10,37,64,.1);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(13,74,122,.35),0 4px 10px rgba(10,37,64,.15);}
+.btn-secondary{background:var(--paper-warm);color:var(--ink);border:1px solid var(--divider);}
+.btn-secondary:hover{background:var(--paper-dark);border-color:var(--ink-light);transform:translateY(-1px);}
+
+/* ═══════════ SCREENSHOT CARD PAGE ═══════════ */
+.card-page{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:48px 28px;text-align:center;position:relative;overflow:hidden;
+  background:var(--brand-sky);
+}
+.card-page .bg-img{
+  position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;
+}
+.card-page .bg-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.82) 0%,rgba(255,255,255,.75) 50%,rgba(255,255,255,.88) 100%);
+}
+.card-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;}
+.card-header-badge{
+  display:inline-block;padding:7px 20px;background:linear-gradient(135deg,var(--brand-blue),var(--brand-med));color:#fff;
+  border-radius:24px;font-size:11px;font-weight:700;letter-spacing:.1em;margin-bottom:40px;
+  box-shadow:0 4px 16px rgba(13,74,122,.2);
+}
+.card-persona-name{
+  font-size:34px;font-weight:900;font-family:var(--font-serif);
+  margin-bottom:10px;line-height:1.3;letter-spacing:.06em;
+  background:linear-gradient(135deg,var(--brand-deep),var(--brand-med),var(--brand-accent));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--brand-deep);
+}
+.card-persona-tagline{
+  font-size:14px;color:var(--ink-med);line-height:1.8;max-width:320px;margin:0 auto 36px;text-align:left;
+}
+.card-divider{width:48px;height:2px;background:linear-gradient(90deg,transparent,var(--brand-accent),transparent);margin-bottom:36px;}
+.card-footer{
+  font-size:11px;color:var(--ink-light);letter-spacing:.05em;
+}
+.card-footer .cf-brand{font-weight:700;color:var(--brand-blue);}
+.card-footer .cf-url{opacity:.5;}
+
+body.dark .card-page .bg-overlay{
+  background:linear-gradient(180deg,rgba(13,15,19,.82) 0%,rgba(13,15,19,.75) 50%,rgba(13,15,19,.88) 100%);
+}
+body.dark .card-persona-name{
+  background:linear-gradient(135deg,var(--brand-sky),var(--brand-accent),var(--ink));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+body.dark .card-footer{color:var(--ink-light);}
+body.dark .card-footer .cf-brand{color:var(--brand-accent);}
+
+/* ═══════════ QUEUE ═══════════ */
+.queue-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,37,64,.95);
+  z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.queue-overlay.show{opacity:1;pointer-events:auto;}
+.queue-number{font-family:var(--font-mono);font-size:72px;font-weight:700;color:#fff;animation:queuePulse .8s ease-in-out infinite;}
+@keyframes queuePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.85}}
+.queue-text{color:rgba(255,255,255,.5);font-size:14px;margin-top:12px;letter-spacing:.1em;}
+.queue-dots{display:flex;gap:8px;margin-top:20px;}
+.queue-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);animation:dotBlink 1.4s ease-in-out infinite;}
+.queue-dot:nth-child(2){animation-delay:.2s;}
+.queue-dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotBlink{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+/* ═══════════ TOAST ═══════════ */
+.toast{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:999;
+  background:var(--ink);color:#fff;padding:12px 28px;border-radius:28px;font-weight:700;
+  font-size:13px;opacity:0;transition:opacity .35s,transform .35s var(--ease-out);pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(10,37,64,.25);
+}
+.toast.show{opacity:1;}
+
+@media(max-width:380px){
+  .reg-brand h1{font-size:20px;}.consult-body .q-text{font-size:17px;}
+  .rpt-header .rpt-hospital{font-size:16px;}.landscape-container{height:180px;}
+  .group-grid{grid-template-columns:1fr 1fr;gap:8px;}.group-card .gc-emoji{font-size:28px;}
+  .share-card .sc-score{font-size:44px;}
+}
+@media(min-width:481px){.app{border-radius:16px;margin-top:20px;margin-bottom:20px;}body{padding:12px 0;}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- 加载动画 -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">加载中...</div>
+</div>
+
+<!-- 排队动画 -->
+<div class="queue-overlay" id="queueOverlay">
+  <div class="queue-number" id="queueNumber">042</div>
+  <div class="queue-text">正在为您排队挂号...</div>
+  <div class="queue-dots">
+    <div class="queue-dot"></div><div class="queue-dot"></div><div class="queue-dot"></div>
+  </div>
+</div>
+
+<!-- 截图卡片页 -->
+<div class="screen" id="scr-card">
+  <div class="card-page">
+    <img class="bg-img" id="cardPersonaImg" src="" alt="" />
+    <div class="bg-overlay"></div>
+    <div class="card-content">
+      <div class="card-header-badge">当代青年精神体检中心</div>
+      <div class="card-persona-name" id="cardPersonaName"></div>
+      <div class="card-persona-tagline" id="cardPersonaTagline"></div>
+      <div class="card-divider"></div>
+      <div class="card-footer">
+        <span class="cf-brand">当代青年精神体检中心</span><br>
+        <span class="cf-url">你是哪种精神人设？来测 →</span>
+      </div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-action btn-secondary" onclick="goBackFromCard()">← 返回</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 暗色模式切换 -->
+<button class="dark-toggle" id="darkToggle" onclick="toggleDarkMode()" title="切换深色模式">🌙</button>
+
+<!-- ═══════════ SCREEN 1: REGISTRATION ═══════════ -->
+<div class="screen active scr-register" id="scr-register">
+  <div class="reg-brand">
+    <div class="cross-icon">🏥</div>
+    <h1>精神体检中心</h1>
+    <div class="dept-name">当代人类心理健康专科门诊 · 3.1</div>
+  </div>
+
+  <div class="reg-progress" id="regProgress">
+    <div class="prog-step">
+      <div class="prog-dot active" id="progDot1"></div>
+      <div class="prog-line" id="progLine1"></div>
+      <div class="prog-label active" id="progLabel1">选择身份</div>
+    </div>
+    <div class="prog-step">
+      <div class="prog-dot" id="progDot2"></div>
+      <div class="prog-line" id="progLine2"></div>
+      <div class="prog-label" id="progLabel2">细分群体</div>
+    </div>
+    <div class="prog-step">
+      <div class="prog-dot" id="progDot3"></div>
+      <div class="prog-label" id="progLabel3">填写信息</div>
+    </div>
+  </div>
+
+  <!-- Step 1: 群体选择 -->
+  <div class="reg-step show" id="regStep1">
+    <div class="reg-card">
+      <div class="card-icon-row">
+        <span class="card-icon">🏷️</span>
+        <span class="card-title">请选择你的身份</span>
+      </div>
+      <div class="group-grid">
+        <div class="group-card" onclick="selectGroup('student',this)" id="gcStudent">
+          <span class="gc-emoji">🎒</span>
+          <span class="gc-name">学生</span>
+          <span class="gc-desc">学龄前~大学生</span>
+        </div>
+        <div class="group-card" onclick="selectGroup('worker',this)" id="gcWorker">
+          <span class="gc-emoji">💼</span>
+          <span class="gc-name">社会人</span>
+          <span class="gc-desc">职场·自由职业</span>
+        </div>
+      </div>
+    </div>
+    <div class="reg-nav">
+      <button class="btn-reg btn-reg-primary" id="btnStep1" disabled onclick="goStep(2)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: 细分选择 -->
+  <div class="reg-step" id="regStep2">
+    <div class="reg-card">
+      <div class="card-icon-row">
+        <span class="card-icon">📂</span>
+        <span class="card-title" id="step2Title">选择细分群体</span>
+      </div>
+      <div class="sub-options" id="subOptions"></div>
+    </div>
+    <div class="reg-nav">
+      <button class="btn-reg btn-reg-secondary" onclick="goStep(1)">← 上一步</button>
+      <button class="btn-reg btn-reg-primary" id="btnStep2" disabled onclick="goStep(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: 姓名 -->
+  <div class="reg-step" id="regStep3">
+    <div class="reg-card">
+      <div class="card-icon-row">
+        <span class="card-icon">📋</span>
+        <span class="card-title">填写信息</span>
+      </div>
+      <div class="field">
+        <label>你的名字（网名也行）</label>
+        <input type="text" id="patientName" placeholder="请输入你的名字" maxlength="12" autocomplete="off">
+      </div>
+      <div class="preschool-tip" id="preschoolTip">🍼 准备好了吗？小朋友！要认真答题哦~</div>
+    </div>
+    <div class="reg-nav">
+      <button class="btn-reg btn-reg-secondary" onclick="goStep(2)">← 上一步</button>
+      <button class="btn-reg btn-reg-primary" onclick="startCheckup()">开始体检 →</button>
+    </div>
+  </div>
+
+  <div class="reg-disclaimer">* 本体检仅供娱乐，不构成医学诊断。<br>如有不适，请放下手机多喝热水。</div>
+</div>
+
+<!-- ═══════════ SCREEN 2: CONSULTATION ═══════════ -->
+<div class="screen scr-consult" id="scr-consult">
+  <div class="consult-topbar">
+    <button class="btn-back" onclick="prevQuestion()">←</button>
+    <div class="step-meta">
+      <div class="step-label">第 <span id="qIndex">1</span> / <span id="qTotal">10</span> 题</div>
+      <div class="step-title" id="stepTitle">精神内耗检测</div>
+    </div>
+  </div>
+  <div class="consult-progress"><div class="fill" id="progressFill" style="width:0%"></div></div>
+  <div class="heartbeat-bar">
+    <svg viewBox="0 0 480 36" preserveAspectRatio="none">
+      <path class="heartbeat-line" id="heartbeatPath" d="M0,18 L80,18 L85,18 L90,8 L95,32 L100,18 L480,18"/>
+    </svg>
+  </div>
+  <div class="consult-body">
+    <div class="q-number" id="qNumber">01</div>
+    <div class="q-text" id="qText"></div>
+    <div class="q-options" id="qOptions"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN 3: REPORT ═══════════ -->
+<div class="screen scr-report" id="scr-report">
+  <div class="landscape-container" id="landscapeContainer">
+    <div class="landscape-overlay">
+      <div class="landscape-label">精神景观 · MENTAL LANDSCAPE</div>
+      <div class="landscape-title" id="landscapeTitle">你的精神地貌</div>
+      <div class="landscape-desc" id="landscapeDesc">由你的10道答题共同塑造的独特流场</div>
+    </div>
+  </div>
+  <div class="report-doc">
+    <div class="rpt-header">
+      <div class="rpt-hospital">当代青年精神体检中心</div>
+      <div class="rpt-dept">心理健康专科 · 检测报告</div>
+      <div class="rpt-group-badge" id="rptGroupBadge"></div>
+    </div>
+    <div class="rpt-body">
+      <div class="rpt-section">
+        <div class="rpt-section-title">患者信息</div>
+        <div class="info-grid">
+          <div class="info-cell"><div class="info-label">姓名</div><div class="info-value" id="rptName">—</div></div>
+          <div class="info-cell"><div class="info-label">身份分组</div><div class="info-value" id="rptGroup">—</div></div>
+          <div class="info-cell"><div class="info-label">检测日期</div><div class="info-value" id="rptDate">—</div></div>
+          <div class="info-cell"><div class="info-label">检测编号</div><div class="info-value" id="rptId" style="font-family:var(--font-mono);font-size:11px;">—</div></div>
+        </div>
+      </div>
+      <div class="peer-compare" id="peerCompare" style="display:none;">
+        <div class="peer-header">📊 同龄人对比</div>
+        <div id="peerStats"></div>
+      </div>
+      <div class="rpt-section">
+        <div class="rpt-section-title">各项指标检测</div>
+        <div class="score-explain" id="scoreExplain" onclick="toggleScoreExplain()">
+          <div class="explain-header">📊 分数是如何计算的？</div>
+          <div class="explain-body">每道题的每个选项都预先设定了不同指标的得分权重。选择A/B/C/D后，各项指标根据对应权重累加再除以题目总数取平均值。不同身份群体使用完全不同的题库和权重体系。</div>
+        </div>
+        <div id="indicators"></div>
+      </div>
+      <div class="rpt-section">
+        <div class="rpt-section-title">医生诊断</div>
+        <div class="diag-block">
+          <div class="diag-label">DIAGNOSIS</div>
+          <div class="diag-text" id="diagText"></div>
+        </div>
+        <div class="dr-note" id="drNote" style="display:none;">
+          <div class="dr-note-label">📝 医生备注</div>
+          <div class="dr-note-text" id="drNoteText"></div>
+        </div>
+        <div id="easterEggBadge" style="text-align:center;"></div>
+        <div class="stamp-wrap"><div class="stamp" id="stampText"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-action btn-secondary" onclick="restartCheckup()">🔄 重新体检</button>
+    <button class="btn-action btn-primary" onclick="goToPrescription()">💊 查看处方</button>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN 4: PRESCRIPTION ═══════════ -->
+<div class="screen scr-presc" id="scr-presc">
+  <div class="presc-doc">
+    <div class="rpt-header">
+      <div class="rpt-hospital">当代青年精神体检中心</div>
+      <div class="rpt-dept">处方笺 · Rx</div>
+    </div>
+    <div class="presc-body">
+      <div class="rpt-section">
+        <div class="rpt-section-title">患者信息</div>
+        <div class="info-grid">
+          <div class="info-cell"><div class="info-label">姓名</div><div class="info-value" id="rxName">—</div></div>
+          <div class="info-cell"><div class="info-label">诊断编号</div><div class="info-value" id="rxId" style="font-family:var(--font-mono);font-size:11px;">—</div></div>
+        </div>
+      </div>
+      <div class="rpt-section">
+        <div class="rpt-section-title">Rp. 处方</div>
+        <div class="rx-list" id="rxItems"></div>
+      </div>
+      <div class="rx-review" id="rxReview" style="display:none;">
+        <div class="review-header">📅 复查建议</div>
+        <div id="rxReviewText"></div>
+      </div>
+      <div class="rx-signature">
+        <div class="sig-left">
+          <div>主治医师：</div>
+          <div class="sig-doctor" id="rxDoctorName">—</div>
+          <div class="sig-scribble" id="rxDoctorSig">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:var(--ink-light);">日期：</div>
+          <div style="font-weight:700;" id="rxDate">—</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:10px;color:var(--ink-light);text-align:center;">* 本处方仅供娱乐，请勿当真。如有不适，建议喝杯奶茶。</div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-action btn-secondary" onclick="restartCheckup()">🔄 重新体检</button>
+    <button class="btn-action btn-primary" onclick="showCardPage()">🖼️ 查看结果卡片</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════ */
+var userGroup = '';
+var userSubGroup = '';
+var currentStep = 1;
+var currentQ = 0;
+var answers = [];
+var totalScore = 0;
+var tagCounts = {};
+var personaLabel = '';
+var personaDesc = '';
+var patientName = '';
+var p5Instance = null;
+var currentDoctor = null;
+var currentQuestions = [];
+var easterEggTriggered = false;
+var easterEggType = '';
+var achievement = '';
+var isDarkMode = false;
+
+var groupLabels = {
+  'student-preschool': '学龄前儿童',
+  'student-k9': '九年义务教育学生',
+  'student-highschool': '高中生',
+  'student-college': '大学生',
+  'worker-junior': '职场新人（0-3年）',
+  'worker-senior': '职场老手（3年+）',
+  'worker-freelance': '自由职业 / 其他'
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   DOCTORS — 分组匹配
+   ═══════════════════════════════════════════════════════════════ */
+var studentDoctors = [
+  { name: '王德发', sig: '王德发' },
+  { name: '雷仁', sig: '雷仁' },
+  { name: '艾老己', sig: '艾老己' },
+  { name: '栾回', sig: '栾回' },
+  { name: '陆仁贾', sig: '陆仁贾' },
+  { name: '莫得事', sig: '莫得事' },
+  { name: '布耀方', sig: '布耀方' }
+];
+
+var workerDoctors = [
+  { name: '养龙霞', sig: '养龙霞' },
+  { name: '甄能睡', sig: '甄能睡' },
+  { name: '赵理由', sig: '赵理由' },
+  { name: '梅烦恼', sig: '梅烦恼' },
+  { name: '焦绿', sig: '焦绿' },
+  { name: '郝心情', sig: '郝心情' },
+  { name: '钱多多', sig: '钱多多' },
+  { name: '牛马达人', sig: '牛马达人' }
+];
+
+function pickDoctor() {
+  var pool = userGroup === 'student' ? studentDoctors : workerDoctors;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE TOGGLE
+   ═══════════════════════════════════════════════════════════════ */
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('dark', isDarkMode);
+  document.getElementById('darkToggle').textContent = isDarkMode ? '☀️' : '🌙';
+  // 重新渲染粒子景观
+  if (p5Instance && document.getElementById('scr-report').classList.contains('active')) {
+    launchLandscape();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING ANIMATION
+   ═══════════════════════════════════════════════════════════════ */
+function showLoading(callback, duration) {
+  var overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+  setTimeout(function () {
+    overlay.classList.remove('show');
+    if (callback) callback();
+  }, duration || 500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REGISTRATION 3-STEP
+   ═══════════════════════════════════════════════════════════════ */
+function selectGroup(group, el) {
+  userGroup = group;
+  userSubGroup = '';
+  document.querySelectorAll('.group-card').forEach(function (c) {
+    c.classList.remove('selected', 'selected-student', 'selected-worker');
+  });
+  if (group === 'student') {
+    el.classList.add('selected', 'selected-student');
+  } else {
+    el.classList.add('selected', 'selected-worker');
+  }
+  document.getElementById('btnStep1').disabled = false;
+}
+
+function goStep(step) {
+  currentStep = step;
+  // 更新进度点
+  ['progDot1', 'progDot2', 'progDot3'].forEach(function (id, i) {
+    var dot = document.getElementById(id);
+    var label = document.getElementById('progLabel' + (i + 1));
+    dot.classList.remove('done', 'active');
+    label.classList.remove('active');
+    if (i + 1 < step) dot.classList.add('done');
+    if (i + 1 === step) {
+      dot.classList.add('active');
+      label.classList.add('active');
+    }
+  });
+  // 更新进度线
+  ['progLine1', 'progLine2'].forEach(function (id, i) {
+    var line = document.getElementById(id);
+    if (i + 1 < step) line.classList.add('done');
+    else line.classList.remove('done');
+  });
+  // 切换步骤卡片
+  document.querySelectorAll('.reg-step').forEach(function (s) {
+    s.classList.remove('show');
+  });
+  document.getElementById('regStep' + step).classList.add('show');
+
+  if (step === 2) {
+    renderSubOptions();
+    document.getElementById('btnStep2').disabled = !userSubGroup;
+  }
+  if (step === 3) {
+    document.getElementById('preschoolTip').classList.toggle('show', userSubGroup === 'preschool');
+  }
+}
+
+function renderSubOptions() {
+  var options = [];
+  var title = '';
+  if (userGroup === 'student') {
+    title = '选择学段';
+    options = [
+      { emoji: '🍼', name: '学龄前儿童', age: '3-6岁', value: 'preschool' },
+      { emoji: '📚', name: '九年义务教育', age: '7-15岁', value: 'k9' },
+      { emoji: '📝', name: '高中', age: '16-18岁', value: 'highschool' },
+      { emoji: '🎓', name: '大学', age: '19-22岁', value: 'college' }
+    ];
+  } else {
+    title = '选择类型';
+    options = [
+      { emoji: '🐮', name: '职场新人', age: '入职0-3年', value: 'junior' },
+      { emoji: '🦅', name: '职场老手', age: '入职3年+', value: 'senior' },
+      { emoji: '🆓', name: '自由职业 / 其他', age: 'Gap·创业·数字游民', value: 'freelance' }
+    ];
+  }
+  document.getElementById('step2Title').textContent = title;
+  var html = '';
+  options.forEach(function (o) {
+    html += '<div class="sub-option" onclick="selectSubGroup(\'' + o.value + '\',this)" data-value="' + o.value + '">';
+    html += '<span class="so-emoji">' + o.emoji + '</span>';
+    html += '<span>' + o.name + ' <span class="so-age">' + o.age + '</span></span>';
+    html += '</div>';
+  });
+  document.getElementById('subOptions').innerHTML = html;
+}
+
+function selectSubGroup(val, el) {
+  userSubGroup = val;
+  document.querySelectorAll('.sub-option').forEach(function (o) {
+    o.classList.remove('selected', 'selected-student', 'selected-worker');
+  });
+  var cls = userGroup === 'student' ? 'selected-student' : 'selected-worker';
+  el.classList.add('selected', cls);
+  document.getElementById('btnStep2').disabled = false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EASTER EGGS
+   ═══════════════════════════════════════════════════════════════ */
+function checkEasterEgg(answers, group, subGroup) {
+  if (answers.length < 10) return false;
+  var allA = answers.every(function (a) { return a === 0; });
+  var allB = answers.every(function (a) { return a === 1; });
+  var allC = answers.every(function (a) { return a === 2; });
+  var allD = answers.every(function (a) { return a === 3; });
+
+  // 学龄前专属
+  if (subGroup === 'preschool') {
+    if (allA || allB || allC || allD) {
+      easterEggType = 'preschool_all_same';
+      achievement = '全选战神';
+      easterEggTriggered = true;
+      return true;
+    }
+    var correctMap = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+    var correctCount = 0;
+    for (var i = 0; i < 10; i++) {
+      if (answers[i] === correctMap[i]) correctCount++;
+    }
+    if (correctCount >= 8) {
+      easterEggType = 'preschool_genius';
+      achievement = '幼儿园卷王';
+      easterEggTriggered = true;
+      return true;
+    }
+  }
+
+  // 学生组
+  if (group === 'student' && subGroup !== 'preschool') {
+    if (allC) {
+      easterEggType = 'student_buddha';
+      achievement = '佛系学霸';
+      easterEggTriggered = true;
+      return true;
+    }
+    if (allA) {
+      easterEggType = 'student_grind';
+      achievement = '卷王之王';
+      easterEggTriggered = true;
+      return true;
+    }
+  }
+
+  // 打工人组
+  if (group === 'worker') {
+    if (allB) {
+      easterEggType = 'worker_fish';
+      achievement = '摸鱼大师';
+      easterEggTriggered = true;
+      return true;
+    }
+    if (allD) {
+      easterEggType = 'worker_quit';
+      achievement = '离职预备役';
+      easterEggTriggered = true;
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUESTION BANKS
+   ═══════════════════════════════════════════════════════════════ */
+function getQuestions(group, subGroup) {
+  var bank = questionBanks[group + '_' + subGroup];
+  if (!bank) bank = questionBanks['student_k9'];
+  return bank.slice(0, 10);
+}
+
+var questionBanks = {};
+
+/* PRESCHOOL - 大学级难题×反差萌选项 */
+questionBanks['student_preschool'] = [
+  { title: '高等微积分', text: '请计算定积分：<i>∫</i><sub>0</sub><sup>∞</sup> <i>e</i><sup>-<i>x</i>²</sup> <i>dx</i> = ？', options: [
+    { letter: 'A', text: '√π/2（高斯积分，拉普拉斯变换可证）', v: 8, tag: 'think' },
+    { letter: 'B', text: '大概等于3.14，因为π约等于3.14，开根号再除以2...让我再算算', v: 2, tag: 'fish' },
+    { letter: 'C', text: '这个符号我认识，叫"积分"，但后面的东西像猫踩键盘踩出来的', v: 3, tag: 'grind' },
+    { letter: 'D', text: '我用计算器按了一下，显示"Syntax Error"', v: 4, tag: 'plant' }
+  ]},
+  { title: '量子场论', text: '希格斯玻色子（上帝粒子）在标准模型中如何赋予基本粒子质量？', options: [
+    { letter: 'A', text: '希格斯场自发对称性破缺，W/Z玻色子获得质量，费米子通过汤川耦合获得质量', v: 8, tag: 'think' },
+    { letter: 'B', text: '上帝粒子就是上帝捏的粒子，用来造世界的，跟女娲捏泥人一个道理', v: 3, tag: 'fish' },
+    { letter: 'C', text: '这个粒子在《武林外传》里吕秀才讲过，他讲了半小时佟湘玉都没听懂', v: 3, tag: 'grind' },
+    { letter: 'D', text: '赋予质量？那瘦子多接触希格斯粒子是不是就能变胖？物理学减肥新思路', v: 4, tag: 'buddha' }
+  ]},
+  { title: '抽象代数', text: '证明柯西定理：若G是有限群，素数p整除|G|，则G中存在p阶元素', options: [
+    { letter: 'A', text: '构造G在自身上的平移作用，利用轨道-稳定子定理和类方程，归纳可得', v: 8, tag: 'think' },
+    { letter: 'B', text: '"群"是微信群吗？p阶就是拼多多砍一刀？我群里有p个人在帮我砍价', v: 3, tag: 'fish' },
+    { letter: 'C', text: '柯西定理和柯西不等式是同一个人吗？柯镇恶也是柯西家的吗？', v: 3, tag: 'grind' },
+    { letter: 'D', text: '这道题让我想起了小学奥数，但小学奥数最多让你证明"奇数+奇数=偶数"', v: 4, tag: 'plant' }
+  ]},
+  { title: '拓扑学', text: '甜甜圈和咖啡杯在拓扑学意义下是同胚的吗？为什么？', options: [
+    { letter: 'A', text: '是的，两者都是亏格为1的紧致二维流形，可通过连续变形相互转化', v: 8, tag: 'think' },
+    { letter: 'B', text: '不一样！甜甜圈能吃，咖啡杯不能吃——除非你把咖啡杯也吃掉', v: 3, tag: 'fish' },
+    { letter: 'C', text: '同胚就是"同一个胚胎"的意思，甜甜圈和咖啡杯是失散多年的双胞胎', v: 3, tag: 'grind' },
+    { letter: 'D', text: '最大的共同点是它们都出现在早餐店里——打工人标配：油条配豆浆，咖啡杯配甜甜圈', v: 4, tag: 'buddha' }
+  ]},
+  { title: '有机化学', text: '写出由苯合成对硝基苯甲酸的全合成路线（含反应条件）', options: [
+    { letter: 'A', text: '苯→傅-克酰基化→氧化→硝化，或硝化→还原→重氮化→桑德迈尔反应→氧化', v: 8, tag: 'think' },
+    { letter: 'B', text: '把苯加点硝酸搅一搅，加点高锰酸钾再搅一搅——我化学老师是这么教的（不是）', v: 3, tag: 'fish' },
+    { letter: 'C', text: '苯环上画个六边形，随便画几个箭头，写上"加热回流"，阅卷老师会给步骤分的', v: 4, tag: 'grind' },
+    { letter: 'D', text: '我只会用苯来擦白板上的记号笔，不知道它还能合成别的东西', v: 2, tag: 'plant' }
+  ]},
+  { title: '量子力学', text: '解释海森堡不确定性原理：<i>Δx·Δp</i> ≥ <i>ℏ</i>/2', options: [
+    { letter: 'A', text: '粒子的位置和动量不可同时精确测量，两者不确定度乘积不小于约化普朗克常数的一半', v: 8, tag: 'think' },
+    { letter: 'B', text: '说明我找不到手机的时候，手机也在找我——我们互相不确定对方的位置', v: 3, tag: 'fish' },
+    { letter: 'C', text: '这解释了为什么你永远不知道猫在哪，也永远不知道它下一秒要跑多快', v: 3, tag: 'grind' },
+    { letter: 'D', text: '海森堡开车超速被拦，交警问"开多快"，他说"不知道，但我知道我在哪"', v: 4, tag: 'plant' }
+  ]},
+  { title: '数理逻辑', text: '哥德尔不完备定理的核心证明思路是什么？', options: [
+    { letter: 'A', text: '通过哥德尔编码将"本命题不可证"的元数学命题映射到形式算术系统中，构造自指悖论', v: 8, tag: 'think' },
+    { letter: 'B', text: '简单说：数学里有些真命题你永远证明不了——接受吧，这就是命', v: 3, tag: 'fish' },
+    { letter: 'C', text: '这个定理告诉我们：老师出的题不一定都有答案，答不出来不能全怪你', v: 4, tag: 'grind' },
+    { letter: 'D', text: '哥德尔证明了"数学家在数学里证明数学有东西证明不了"，然后数学家们就崩溃了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '计算机科学', text: 'P vs NP问题为什么被列为千禧年七大数学难题之一？', options: [
+    { letter: 'A', text: 'P类可多项式时间求解，NP类可多项式时间验证。P=NP? 将颠覆密码学、优化、AI等领域', v: 8, tag: 'think' },
+    { letter: 'B', text: 'P=容易，NP=不容易但验证容易。问题是"容易"和"验证容易"是不是一回事', v: 3, tag: 'fish' },
+    { letter: 'C', text: '如果能证明P=NP，所有密码瞬间破解，微信支付和支付宝明天就倒闭', v: 4, tag: 'grind' },
+    { letter: 'D', text: '我已经证明了P=NP，但这里空白太小写不下', v: 2, tag: 'buddha' }
+  ]},
+  { title: '语言学', text: '用乔姆斯基的生成语法理论分析"张三被李四打了"的深层结构', options: [
+    { letter: 'A', text: 'D-structure为[<sub>IP</sub>[<sub>NP</sub>李四][<sub>VP</sub>[<sub>V\'</sub>打了][<sub>NP</sub>张三]]]，被动化移位使张三移至[Spec,IP]获得主格', v: 8, tag: 'think' },
+    { letter: 'B', text: '深层结构就是"李四打了张三"，然后"张三"跑到前面加个"被"，变成"被李四打了"', v: 3, tag: 'fish' },
+    { letter: 'C', text: '乔姆斯基是语言学家，不是那个巧克力品牌——虽然名字很像，但巧克力不能分析语法', v: 3, tag: 'grind' },
+    { letter: 'D', text: '这个句子的深层结构是：张三真惨，被人打了还要被语言学家分析一遍', v: 4, tag: 'plant' }
+  ]},
+  { title: '金融数学', text: '推导布莱克-斯科尔斯期权定价模型的偏微分方程', options: [
+    { letter: 'A', text: '基于无套利原理，Δ对冲+伊藤引理，得 ∂V/∂t + ½σ²S²∂²V/∂S² + rS∂V/∂S - rV = 0', v: 8, tag: 'think' },
+    { letter: 'B', text: '核心思想：在理想世界里，期权可以通过不断买卖股票来完美复制——可惜世界不理想', v: 3, tag: 'fish' },
+    { letter: 'C', text: '布莱克和斯科尔斯因为这个公式拿了诺贝尔经济学奖——可惜布莱克去世了没领到', v: 4, tag: 'grind' },
+    { letter: 'D', text: '这个公式在《繁花》里出现过，宝总用它算股票，算对了但还是差点破产', v: 2, tag: 'buddha' }
+  ]}
+];
+
+/* K9 — 校园荒诞主义 */
+questionBanks['student_k9'] = [
+  { title: '已读乱回', text: '同桌给你发了一长段小作文，你的回复是？', options: [
+    { letter: 'A', text: '秒回"哈哈哈哈哈哈"，然后发现她说的是她家猫去世了，撤回已来不及', v: 8, tag: 'storm' },
+    { letter: 'B', text: '认真分析每句话，写了300字回复，发出去发现已被拉黑', v: 6, tag: 'think' },
+    { letter: 'C', text: '已读，但没回——打游戏打到忘记手机还有聊天功能', v: 3, tag: 'fish' },
+    { letter: 'D', text: '回了个黄豆微笑表情，然后关机睡觉，第二天说"昨晚手机没电了"', v: 1, tag: 'buddha' }
+  ]},
+  { title: '课堂尴尬', text: '老师点名让你回答问题，你完全没听课，站起来后——', options: [
+    { letter: 'A', text: '大脑一片空白，和老师对视了整整十秒，全班安静得能听见心跳', v: 9, tag: 'storm' },
+    { letter: 'B', text: '开始胡编乱造，硬是把一道数学题回答成了历史课的内容，老师说"你坐下吧"', v: 6, tag: 'think' },
+    { letter: 'C', text: '小声说"老师我没听懂"，然后同桌疯狂给你递答案，但字太潦草你看不清', v: 4, tag: 'fish' },
+    { letter: 'D', text: '坦然承认"我没听课"，老师愣了一下反而笑了，说"诚实加分"', v: 2, tag: 'buddha' }
+  ]},
+  { title: 'AI判官', text: '你用DeepSeek帮你写作文，结果老师用AI检测查出来了，你？', options: [
+    { letter: 'A', text: '在办公室哭得梨花带雨，说"AI害我"，老师差点信了', v: 8, tag: 'storm' },
+    { letter: 'B', text: '连夜研究反AI检测技术，决定和老师进入军备竞赛', v: 7, tag: 'think' },
+    { letter: 'C', text: '狡辩说这是"人机协作"不是"抄袭"，老师愣了五秒', v: 4, tag: 'fish' },
+    { letter: 'D', text: '让AI帮你写了一份检讨书，然后又用AI查重查了一遍，完美闭环', v: 2, tag: 'buddha' }
+  ]},
+  { title: '偷感', text: '在教室偷偷吃辣条，被班主任从后门盯了三十秒，你？', options: [
+    { letter: 'A', text: '辣条直接呛进气管，咳嗽三分钟，全班围观，班主任也没绷住笑出声', v: 8, tag: 'storm' },
+    { letter: 'B', text: '把辣条包装纸揉成团塞进袖子里，假装自己一直在思考数学题', v: 6, tag: 'think' },
+    { letter: 'C', text: '和老师对视三秒，缓缓把辣条递过去："老师，您也来一根？"', v: 3, tag: 'fish' },
+    { letter: 'D', text: '完全没发现老师，吃完才发现全班都在憋笑，老师已经走了', v: 1, tag: 'buddha' }
+  ]},
+  { title: '硬控', text: '说好只看五分钟短视频，回过神已经过去两小时，你？', options: [
+    { letter: 'A', text: '陷入深深自责，制定"明日戒手机计划"——已经是第38次了', v: 8, tag: 'storm' },
+    { letter: 'B', text: '开始认真计算：每天浪费两小时，一年就是730小时，然后更焦虑了', v: 6, tag: 'think' },
+    { letter: 'C', text: '算了，反正作业也写不完，再刷一会，破罐破摔是门艺术', v: 4, tag: 'fish' },
+    { letter: 'D', text: '"人活着不就是为了快乐吗？"——然后继续刷，毫无心理负担', v: 1, tag: 'buddha' }
+  ]},
+  { title: 'i人地狱', text: '老师让你在全班面前即兴演讲，你站在讲台上，第一句话是？', options: [
+    { letter: 'A', text: '声音颤抖地说"大...大家好"，然后大脑一片空白，安静了整整三十秒', v: 9, tag: 'storm' },
+    { letter: 'B', text: '提前准备了逐字稿，但念到一半发现稿子拿反了，硬着头皮倒着念', v: 7, tag: 'think' },
+    { letter: 'C', text: '直接开始freestyle，讲了十分钟，但没人知道主题是什么，老师说"你先下去"', v: 4, tag: 'fish' },
+    { letter: 'D', text: '"我放弃了，有没有人想上来替我讲？"——结果真的有人举手了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '松弛感', text: '明天期中考试，今晚你？', options: [
+    { letter: 'A', text: '在书桌前坐了四小时，但有效学习时间不到20分钟，剩下的时间都在焦虑', v: 8, tag: 'storm' },
+    { letter: 'B', text: '整理了一小时文具，又整理了一小时书桌，就是不开始复习', v: 7, tag: 'think' },
+    { letter: 'C', text: '把所有课本压在枕头下，坚信渗透压能传输知识，然后安心睡觉', v: 3, tag: 'fish' },
+    { letter: 'D', text: '九点就睡了，坚信"状态好大于临时抱佛脚"，第二天精神饱满地考砸了', v: 1, tag: 'buddha' }
+  ]},
+  { title: '抽象作业', text: '老师布置了"用诗歌形式写数学作业"，你的反应？', options: [
+    { letter: 'A', text: '真的认真写了，交上去后老师在全班朗读，你当场社死', v: 8, tag: 'storm' },
+    { letter: 'B', text: '用AI生成了一首，但AI把"三角形"写成了"三明治"，你交上去才发现', v: 6, tag: 'think' },
+    { letter: 'C', text: '在作业本上画了一个抽象派涂鸦，题目标注"现代诗"，老师给了个"？"', v: 3, tag: 'fish' },
+    { letter: 'D', text: '直接不交，并在备注写"抽象作业配抽象学生，我请假"，老师笑了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '周一综合征', text: '周一早上进教室，你的精神状态？', options: [
+    { letter: 'A', text: '书包里塞满了周末忘写的作业，进门就开始疯狂抄，手速堪比电竞选手', v: 8, tag: 'storm' },
+    { letter: 'B', text: '眼神空洞，面无表情，像个被抽走了灵魂的NPC，一直念"不想上学"', v: 6, tag: 'think' },
+    { letter: 'C', text: '还在回味周末打游戏的高光时刻，上课时突然笑出声，被老师点名', v: 3, tag: 'fish' },
+    { letter: 'D', text: '精神抖擞，已经预习了下周的内容，全班第一个到——然后趴下补觉', v: 1, tag: 'buddha' }
+  ]},
+  { title: '命运的齿轮', text: '刷到短视频说"命运的齿轮开始转动"，你觉得你的齿轮？', options: [
+    { letter: 'A', text: '已经卡死了，而且好像还掉了几个齿，急需DeepSeek来帮我修一修', v: 9, tag: 'storm' },
+    { letter: 'B', text: '在转，但方向好像反了，离目标越来越远，是不是该倒着走？', v: 7, tag: 'think' },
+    { letter: 'C', text: '什么齿轮？我的人生是一辆没有方向盘的碰碰车，撞到哪算哪', v: 4, tag: 'fish' },
+    { letter: 'D', text: '齿轮生锈了，但我用松弛感当润滑油，转得慢但至少不卡', v: 2, tag: 'buddha' }
+  ]}
+];
+
+/* HIGH SCHOOL — 荒诞青春 */
+questionBanks['student_highschool'] = [
+  { title: '手机防窥膜', text: '你妈突然说"把你手机给我看看"，你的反应？', options: [
+    { letter: 'A', text: '手抖着递过去，心跳180，开始回忆最近浏览记录——完了，昨天搜了"如何藏手机"', v: 9, tag: 'storm' },
+    { letter: 'B', text: '镇定地说"手机没电了"，然后发现屏幕是亮的，当场社死', v: 6, tag: 'think' },
+    { letter: 'C', text: '立刻把手机扔进书包，说"我忘了放哪了"，然后手机在书包里响了', v: 4, tag: 'fish' },
+    { letter: 'D', text: '坦然地递过去——因为所有聊天记录都设了阅后即焚，防窥膜都省了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '深夜大脑', text: '凌晨一点，你躺在床上，大脑在播放什么？', options: [
+    { letter: 'A', text: '三年前社死现场的4K重置版，带环绕立体声，每一个细节都记得清清楚楚', v: 9, tag: 'storm' },
+    { letter: 'B', text: '明天要交的作业的红色倒计时，你还没写，但你在思考"我为什么还没写"', v: 7, tag: 'think' },
+    { letter: 'C', text: '在精心策划如何向暗恋对象表白——已经策划了三年，还没执行', v: 5, tag: 'fox' },
+    { letter: 'D', text: '什么都没放，我已经睡着了——但闹钟显示现在是凌晨三点，我在说梦话', v: 1, tag: 'buddha' }
+  ]},
+  { title: 'AI写作业', text: '你用AI写完了作业，结果老师在班上朗读了你的"优秀作业"，你？', options: [
+    { letter: 'A', text: '脸涨得通红，祈祷没人发现那些"综上所述"是AI的口头禅', v: 8, tag: 'storm' },
+    { letter: 'B', text: '暗自得意——AI写的就是好，下次还用它，进入人机协作新纪元', v: 3, tag: 'fish' },
+    { letter: 'C', text: '开始研究反AI检测技术，决定和老师进入军备竞赛', v: 6, tag: 'grind' },
+    { letter: 'D', text: '老师念完后说"不过有些地方太像AI写的了"，全班看向你，你假装看窗外', v: 9, tag: 'ai' }
+  ]},
+  { title: '高考倒计时', text: '距离高考还有100天，你的精神状态？', options: [
+    { letter: 'A', text: '每天刷题到凌晨，黑眼圈可以当烟熏妆，但成绩还在原地踏步', v: 9, tag: 'storm' },
+    { letter: 'B', text: '制定了详细的百日冲刺计划，已经执行了三天——然后第四天睡过头了', v: 7, tag: 'think' },
+    { letter: 'C', text: '100天？还早呢，我先看个视频放松一下——然后一周过去了', v: 4, tag: 'fish' },
+    { letter: 'D', text: '已经保送了，在教室后排吃瓜看同学们卷，偶尔帮忙递个纸巾', v: 1, tag: 'buddha' }
+  ]},
+  { title: '破防瞬间', text: '你最近一次"破防"是因为什么？', options: [
+    { letter: 'A', text: '辛辛苦苦写了一周的作业，老师说"这个不用交"——当场破防', v: 8, tag: 'storm' },
+    { letter: 'B', text: '看到别人的成绩单，再看了看自己的，默默关掉了手机——成年人最后的体面', v: 7, tag: 'think' },
+    { letter: 'C', text: '外卖被偷了，在宿舍楼下无能狂怒，室友说"算了再点一份"，更气了', v: 5, tag: 'storm' },
+    { letter: 'D', text: '我从不破防——佛系人生，破防是不可能的，最多就是内心默默流泪', v: 2, tag: 'buddha' }
+  ]},
+  { title: '社恐现场', text: '过年亲戚围着你问"考得怎么样"，你？', options: [
+    { letter: 'A', text: '支支吾吾说"还行吧"，然后立刻转移话题——"姑姑你最近好像胖了"', v: 8, tag: 'fox' },
+    { letter: 'B', text: '拿出手机假装接电话，然后躲进厕所，待了半小时才出来', v: 7, tag: 'fox' },
+    { letter: 'C', text: '微笑着说"挺好的，年级前十"，然后接受全场赞美——虽然真实排名是倒数', v: 5, tag: 'fish' },
+    { letter: 'D', text: '大方回答"不太好，但我心态好"，亲戚们反而不知道说什么了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '电子榨菜', text: '你吃饭时必配的"电子榨菜"是什么？', options: [
+    { letter: 'A', text: '学习视频——吃饭也在卷，榨菜是知识，米饭是焦虑', v: 8, tag: 'grind' },
+    { letter: 'B', text: '各种搞笑短视频，一顿饭吃了两小时，因为一直在刷下一个', v: 4, tag: 'fish' },
+    { letter: 'C', text: '没有固定的——今天看美食视频，明天看游戏解说，后天看别人吃饭', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '不配榨菜——专心吃饭，但吃完了发现自己根本不记得吃了什么', v: 6, tag: 'plant' }
+  ]},
+  { title: '纯路人', text: '班里八卦传到了你耳朵里，你的反应？', options: [
+    { letter: 'A', text: '竖起耳朵听完，然后假装什么都没听到——但内心已经在疯狂分析', v: 6, tag: 'think' },
+    { letter: 'B', text: '纯路人，不关心，我只关心今天作业交不交——但其实你也是当事人之一', v: 4, tag: 'buddha' },
+    { letter: 'C', text: '立刻加入讨论，提供了更多细节——然后发现八卦的主角就是你', v: 8, tag: 'storm' },
+    { letter: 'D', text: '听完后默默打开手机，把八卦发给了另一个群——信息的搬运工', v: 3, tag: 'fish' }
+  ]},
+  { title: '示弱文化', text: '同学说"我这次考得好差"，结果成绩出来年级前三，你？', options: [
+    { letter: 'A', text: '内心：又被演了！表面：哇你好厉害！——成年人第一课：学会假笑', v: 8, tag: 'storm' },
+    { letter: 'B', text: '开始反思自己是不是太老实了，决定下次考试前也说"我没复习"', v: 6, tag: 'think' },
+    { letter: 'C', text: '早就习惯了，我已经免疫了', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '自己也说"我考得好差"，然后拿了年级第一，完成了从受害者到施害者的蜕变', v: 5, tag: 'grind' }
+  ]},
+  { title: '爱你老己', text: '网络流行语"爱你老己"——你学会爱自己了吗？', options: [
+    { letter: 'A', text: '爱自己？我连自己是谁都不知道，先找到自己再说吧', v: 8, tag: 'storm' },
+    { letter: 'B', text: '在努力了——今天给自己买了奶茶，虽然是为了熬夜写作业，但至少奶茶是爱', v: 5, tag: 'fish' },
+    { letter: 'C', text: '当然爱自己——每天照镜子都说"你真棒"，然后继续摆烂，爱不等于努力', v: 2, tag: 'buddha' },
+    { letter: 'D', text: '爱你老己？我连老己是谁都不知道，这词火得莫名其妙', v: 4, tag: 'think' }
+  ]}
+];
+
+/* COLLEGE — 躺平荒诞派 */
+questionBanks['student_college'] = [
+  { title: '论文美学', text: '你的毕业论文进度条现在长什么样？', options: [
+    { letter: 'A', text: '只写了标题，但已经改了十八遍——"论当代大学生精神内耗"改成"浅谈"再改成"基于"', v: 9, tag: 'storm' },
+    { letter: 'B', text: '写了三万字，查重率0.3%——但导师说"你这个选题方向完全错了"', v: 8, tag: 'think' },
+    { letter: 'C', text: 'deadline是明天，现在是凌晨两点，我正在用AI生成——然后手动加错别字降重', v: 6, tag: 'fish' },
+    { letter: 'D', text: '什么论文？不是下学期的事吗？——已读乱回，人在床上，灵魂在梦里', v: 3, tag: 'buddha' }
+  ]},
+  { title: '宿舍关系', text: '你室友的雷人行为，最让你崩溃的是？', options: [
+    { letter: 'A', text: '半夜三点开始打游戏，语音开麦喊"兄弟救我"，你在上铺思考人生', v: 8, tag: 'storm' },
+    { letter: 'B', text: '从来不倒垃圾，但每次检查卫生都说"我上周倒了"——你翻了聊天记录发现上次是三个月前', v: 7, tag: 'think' },
+    { letter: 'C', text: '什么都能忍——因为我的耳机降噪能力已经进化到可以过滤室友的呼噜声', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '搬出去住了——宿舍关系？不存在的，我和外卖小哥的关系都比室友亲', v: 5, tag: 'fox' }
+  ]},
+  { title: '生活费博弈', text: '月底了，你的银行卡余额是多少？', options: [
+    { letter: 'A', text: '精确到小数点后两位——3.14元，刚好够买一个包子，但包子已经涨价到3.5了', v: 8, tag: 'storm' },
+    { letter: 'B', text: '不多了，但够用——因为我发明了"泡面+电子榨菜"的极致省钱套餐', v: 5, tag: 'fish' },
+    { letter: 'C', text: '准备给爸妈发"最近过得怎么样"，然后等他们主动问"钱够不够花"', v: 6, tag: 'think' },
+    { letter: 'D', text: '余额充足——因为我兼职了，自己赚钱自己花，虽然赚的不多，但花得很开心', v: 2, tag: 'buddha' }
+  ]},
+  { title: 'AI抢饭碗', text: '看到AI能取代你专业80%的岗位，你？', options: [
+    { letter: 'A', text: '连夜学习AI技能，打不过就加入——开始用AI写代码、画图、做PPT，卷死AI', v: 8, tag: 'ai' },
+    { letter: 'B', text: '很慌，但慌也没用——开始认真考虑转行，但发现每条路都被AI堵了', v: 9, tag: 'ai' },
+    { letter: 'C', text: 'AI再厉害也得有人吃饭——我决定去开餐厅，或者去养龙虾，或者去送外卖', v: 4, tag: 'fish' },
+    { letter: 'D', text: '无所谓——AI不会帮我写论文（等等，它好像真的会），那没事了', v: 3, tag: 'buddha' }
+  ]},
+  { title: '社交电量', text: '周末同学约你出门，你的第一反应？', options: [
+    { letter: 'A', text: '秒回"几点哪里见"——社交达人，但这种人全国不超过5%，你是其中之一吗', v: 1, tag: 'buddha' },
+    { letter: 'B', text: '纠结二十分钟，回复"下次一定"——然后如释重负，继续躺平', v: 7, tag: 'fox' },
+    { letter: 'C', text: '答应了，出门前五分钟后悔了——但不好意思鸽，硬着头皮出门了', v: 8, tag: 'fox' },
+    { letter: 'D', text: '手机静音——周末是我和床的二人世界，谁来都不好使', v: 5, tag: 'fish' }
+  ]},
+  { title: '小组作业', text: '小组作业里，你通常是什么角色？', options: [
+    { letter: 'A', text: '那个做所有事的人——因为其他人都不做，你怕挂科所以扛下了所有', v: 9, tag: 'storm' },
+    { letter: 'B', text: '那个只负责"整合"的人——把大家的东西拼在一起，然后发现每个人写的格式都不一样', v: 6, tag: 'think' },
+    { letter: 'C', text: '那个消失的人——从头到尾没出现，最后一天在群里发了个"辛苦了各位"', v: 3, tag: 'fish' },
+    { letter: 'D', text: '那个提意见的人——"我觉得这个方向不对""我觉得PPT不够好看"，但什么都没做', v: 4, tag: 'grind' }
+  ]},
+  { title: '简历焦虑', text: '写简历时，你发现自己大学四年最大的成就是？', options: [
+    { letter: 'A', text: '绩点3.9，学生会主席，三段实习，简历像印刷品一样漂亮', v: 2, tag: 'grind' },
+    { letter: 'B', text: '把"帮室友拿快递"写成了"物流管理经验"，把"点外卖"写成"供应链协调"', v: 6, tag: 'fish' },
+    { letter: 'C', text: '简历一片空白——开始怀疑自己这四年是不是在地球online里挂机了', v: 9, tag: 'storm' },
+    { letter: 'D', text: '人生最大的成就是活着——心态稳如老狗，简历虽然空，但心率正常', v: 3, tag: 'buddha' }
+  ]},
+  { title: '考研考公', text: '身边的人都在考研考公，你？', options: [
+    { letter: 'A', text: '也在准备——但每天晚上都在想"我为什么要考这个"，然后第二天继续刷题', v: 8, tag: 'storm' },
+    { letter: 'B', text: '在考研和考公之间反复横跳——今天觉得考研有前途，明天觉得考公更稳定', v: 7, tag: 'think' },
+    { letter: 'C', text: '不考——我要去创业，虽然不知道创什么，但先创了再说', v: 4, tag: 'fish' },
+    { letter: 'D', text: '已经想好了退路——回老家种地，养龙虾，开民宿，反正不卷了', v: 2, tag: 'buddha' }
+  ]},
+  { title: '毕业关卡', text: '如果毕业是地球online的一个关卡，你？', options: [
+    { letter: 'A', text: '已经通关——工作/考研都安排好了，正在加载下一关', v: 1, tag: 'grind' },
+    { letter: 'B', text: '还在打BOSS——考研分数出来了，在复试线附近，每天刷新网页八百次', v: 8, tag: 'storm' },
+    { letter: 'C', text: '找不到出口——不知道自己要干什么，地图一片迷雾，连BOSS在哪都不知道', v: 9, tag: 'think' },
+    { letter: 'D', text: '不想通关——想续费四年，永远留在大学这个安全区，外面的世界太可怕了', v: 5, tag: 'fish' }
+  ]},
+  { title: '上头', text: '最近有什么东西让你"上头"到停不下来？', options: [
+    { letter: 'A', text: '焦虑上头了——每天焦虑，但焦虑又让我更焦虑，无限循环中', v: 9, tag: 'storm' },
+    { letter: 'B', text: '短视频上头了——说好看五分钟，回过神来两小时过去了，算法比我还懂我', v: 5, tag: 'fish' },
+    { letter: 'C', text: '被卷王室友带跑偏了——他每天学12小时，我跟着学着学着，已经不认识自己了', v: 7, tag: 'grind' },
+    { letter: 'D', text: '躺平上头了——床是我的本体，我已经和床融为一体，分不开了', v: 3, tag: 'plant' }
+  ]}
+];
+
+/* JUNIOR WORKER — 职场新人 */
+questionBanks['worker_junior'] = [
+  { title: '已读乱回', text: '周五晚上11点，老板在工作群发消息"这个方案明天能不能给我？"，你选择？', options: [
+    { letter: 'A', text: '已读不回，假装睡着了。第二天早上悠悠地回一句"不好意思才看到"', v: 4, tag: 'fish' },
+    { letter: 'B', text: '秒回"好的老板！"然后深夜独自崩溃——为什么要秒回？为什么要秒回？', v: 9, tag: 'storm' },
+    { letter: 'C', text: '已读乱回。"老板我有一个更大胆的想法，要不我们重新做一版？"反向卷，主打一个出其不意', v: 7, tag: 'grind' },
+    { letter: 'D', text: '直接关机。明天的事明天再说，大不了被开除，反正本来就想辞职', v: 6, tag: 'plant' }
+  ]},
+  { title: '班味', text: '同事说你身上有"班味"，你是什么反应？', options: [
+    { letter: 'A', text: '照镜子惊恐地发现：黑眼圈、驼背、眼神空洞。这不叫班味，这叫工伤', v: 8, tag: 'storm' },
+    { letter: 'B', text: '不以为耻反以为荣。"班味是我的勋章，说明我比你们卷"', v: 9, tag: 'grind' },
+    { letter: 'C', text: '决定明天喷香水盖住班味，但不知道香水和班味混在一起更难闻', v: 5, tag: 'think' },
+    { letter: 'D', text: '反问"什么是班味？"你已经闻不到了，说明班味已经入骨', v: 4, tag: 'fish' }
+  ]},
+  { title: '牛马觉醒', text: '某个深夜加班，你突然意识到"牛马竟是我自己"，你的下一步？', options: [
+    { letter: 'A', text: '打开招聘软件开始投简历，万一有更好的呢？投了三个月，石沉大海', v: 7, tag: 'storm' },
+    { letter: 'B', text: '打开外卖软件点杯奶茶安慰自己。牛马也要喝奶茶，这是基本牛权', v: 3, tag: 'fish' },
+    { letter: 'C', text: '冷静分析，列了一个"辞职倒计时"Excel。目前进度：0.3%', v: 6, tag: 'think' },
+    { letter: 'D', text: '认命了，继续加班。牛马就牛马，至少是高级牛马，有社保的那种', v: 5, tag: 'buddha' }
+  ]},
+  { title: '硬控', text: '被KPI"硬控"了三个月，你的精神状态？', options: [
+    { letter: 'A', text: '已经被控到麻木了。睁眼第一件事看数据，做梦都在做报表，KPI已经刻进了DNA', v: 9, tag: 'storm' },
+    { letter: 'B', text: '学会了反向硬控。把KPI做成了Excel艺术品，领导看了都说好，但实际没完成', v: 5, tag: 'fish' },
+    { letter: 'C', text: '主动申请更多KPI。我卷我自己，让领导无KPI可加，卷到极致就是艺术', v: 8, tag: 'grind' },
+    { letter: 'D', text: '放弃抵抗。KPI是什么？我只知道下班时间到了，到点就走', v: 3, tag: 'buddha' }
+  ]},
+  { title: '偷感', text: '在工位上摸鱼，感觉背后有目光，你的反应？', options: [
+    { letter: 'A', text: '瞬间Alt+Tab切换到Excel，假装在分析数据。手指比大脑快，这是肌肉记忆', v: 3, tag: 'fish' },
+    { letter: 'B', text: '不慌，继续刷微博。我摸鱼我骄傲，大不了被说两句，脸皮厚才是真本事', v: 5, tag: 'buddha' },
+    { letter: 'C', text: '提前准备了3个假表格，切换时还有不同配色。专业摸鱼二十年，教科书级别', v: 4, tag: 'fish' },
+    { letter: 'D', text: '已经被抓到过，现在采取"带薪拉屎"策略。物理隔绝监控，无懈可击', v: 6, tag: 'fox' }
+  ]},
+  { title: '显眼包', text: '开会时领导问"大家有什么想法？"，你突然成了显眼包——', options: [
+    { letter: 'A', text: '你举手了，说了一堆自己都听不懂的话。但领导点头了，全场沉默，你成了传说中的显眼包', v: 7, tag: 'storm' },
+    { letter: 'B', text: '你被点名了。"小王你来说说"。你说"我同意张总的意见"，安全过关，经典操作', v: 4, tag: 'fox' },
+    { letter: 'C', text: '你主动站起来，做了一个PPT都没讲完的方案。全场最亮的显眼包，闪瞎所有人', v: 8, tag: 'grind' },
+    { letter: 'D', text: '你假装在记笔记，其实在画小猪佩奇。已经画了第五只了，佩奇全家福快完成了', v: 3, tag: 'fish' }
+  ]},
+  { title: '松弛感', text: '周五下午4:30，你的松弛感拉满了吗？', options: [
+    { letter: 'A', text: '已经松弛了，从下午3点就开始摸鱼。心已经飞到了周末，身体还在工位苟着', v: 3, tag: 'fish' },
+    { letter: 'B', text: '松弛不了。deadline是今天6点，越松弛越焦虑，手已经开始抖了', v: 9, tag: 'storm' },
+    { letter: 'C', text: '假装松弛。身体在工位，表情在泰国，但内心在算还有多少活没干完', v: 6, tag: 'think' },
+    { letter: 'D', text: '主动放弃松弛。周五晚上是加班的好时机，没人打扰，效率拉满', v: 8, tag: 'grind' }
+  ]},
+  { title: '电子榨菜', text: '午饭时间，你配什么"电子榨菜"下饭？', options: [
+    { letter: 'A', text: '短视频，边吃边刷，一刷半小时。饭凉了还在看，电子榨菜比真榨菜还下饭', v: 4, tag: 'fish' },
+    { letter: 'B', text: '工作群消息，边吃边回消息。胃口和心情一起down，这榨菜有毒', v: 8, tag: 'storm' },
+    { letter: 'C', text: '学习视频，看行业大佬讲课。边吃边卷，饭都变香了，高级榨菜', v: 7, tag: 'grind' },
+    { letter: 'D', text: '什么都不看，专心吃饭。享受食物本身的味道，这是社畜最后的尊严', v: 2, tag: 'buddha' }
+  ]},
+  { title: '命运的齿轮', text: '当初投简历时"命运的齿轮开始转动"，现在转到了什么位置？', options: [
+    { letter: 'A', text: '卡住了。齿轮生锈了，转不动了，每天就是重复重复再重复', v: 7, tag: 'plant' },
+    { letter: 'B', text: '转错方向了。当初应该去另一家公司，现在每天都在后悔，后悔药没得卖', v: 8, tag: 'storm' },
+    { letter: 'C', text: '加速转动。升职加薪，齿轮转得飞快，我已经跟不上了，快要被甩出去了', v: 9, tag: 'grind' },
+    { letter: 'D', text: '不确定。齿轮还在转，但不知道转去哪，随缘吧，转到哪算哪', v: 4, tag: 'buddha' }
+  ]},
+  { title: '抽象', text: '老板说"这个需求很简单"，你打开文档后发现需求描述是："做一个像抖音但不是抖音的东西"——', options: [
+    { letter: 'A', text: '直接在群里回复"老板，你这个需求很抽象，能具体一点吗？"然后被已读不回', v: 7, tag: 'storm' },
+    { letter: 'B', text: '开始做，做了三版都被否了。最后老板说"还是第一版好"，血压直接拉满', v: 8, tag: 'grind' },
+    { letter: 'C', text: '拖延，先放三天。说不定老板自己就忘了这个需求，这是概率学', v: 4, tag: 'fish' },
+    { letter: 'D', text: '已读乱回。"好的老板，我研究一下"然后继续做之前的事，完美', v: 3, tag: 'buddha' }
+  ]}
+];
+
+/* SENIOR WORKER — 职场老鸟 */
+questionBanks['worker_senior'] = [
+  { title: '老登', text: '年轻同事在背后叫你"老登"，你听到了，你的反应？', options: [
+    { letter: 'A', text: '微微一笑。"老登就老登，起码我有经验。你们这些小登还得叫我一声老师"', v: 3, tag: 'buddha' },
+    { letter: 'B', text: '内心暴击。照镜子发现自己确实老了，头发少了，肚子大了，岁月不饶人', v: 8, tag: 'storm' },
+    { letter: 'C', text: '开始焦虑。被年轻人叫老登，意味着离被优化不远了，危机感拉满', v: 9, tag: 'ai' },
+    { letter: 'D', text: '当场回怼。"你叫我老登？那你是什么？小登西？"主打一个不服老', v: 6, tag: 'grind' }
+  ]},
+  { title: '示弱文化', text: '2026年流行"示弱文化"——在年轻人面前承认自己不行，你？', options: [
+    { letter: 'A', text: '大方示弱。"这个新工具我不会，你来教教我？"其实心里很爽，终于不用装了', v: 3, tag: 'buddha' },
+    { letter: 'B', text: '拒绝示弱。死要面子活受罪，半夜偷偷学，第二天假装一直都会，演技派', v: 8, tag: 'grind' },
+    { letter: 'C', text: '选择性示弱。会的假装不会，不会的假装会，主打一个薛定谔的能力，深不可测', v: 5, tag: 'think' },
+    { letter: 'D', text: '已经不想装了。示弱示到极致，年轻人觉得你什么都不会，开始教你用Excel', v: 7, tag: 'plant' }
+  ]},
+  { title: 'AI焦虑', text: 'AI能写代码、做PPT、写周报，你干了十年的事AI五分钟搞定，你？', options: [
+    { letter: 'A', text: '拥抱AI。"工具而已，人类的价值在于会用工具。"但私下偷偷焦虑，嘴硬', v: 6, tag: 'ai' },
+    { letter: 'B', text: '深度焦虑。"我学了一辈子的东西，AI五分钟就学会了，我是什么？"哲学问题', v: 9, tag: 'ai' },
+    { letter: 'C', text: '无所谓。"AI再厉害也不能替我开会、替我喝酒、替我背锅。"人类核心竞争力', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '已经在学AI了。"活到老学到老。"但学完发现AI又升级了，永远追不上', v: 7, tag: 'grind' }
+  ]},
+  { title: '房贷BOSS', text: '房贷还剩18年，每个月还贷像打BOSS，你的状态？', options: [
+    { letter: 'A', text: '已经习惯了。"房贷是我最稳定的关系，每个月准时见面，从不迟到"', v: 4, tag: 'buddha' },
+    { letter: 'B', text: '每次还款都心绞痛。"我的工资只是在我卡里路过一下，终点站是银行"', v: 8, tag: 'storm' },
+    { letter: 'C', text: '已经算好了。"再还18年零3个月，还完那天我要把还款短信截图发朋友圈"', v: 5, tag: 'think' },
+    { letter: 'D', text: '已经不看了，自动扣款。眼不见心不烦，假装没有这笔支出，鸵鸟战术', v: 6, tag: 'fish' }
+  ]},
+  { title: '体检报告', text: '体检报告出来了，脂肪肝、尿酸高、腰椎间盘突出，你？', options: [
+    { letter: 'A', text: '开始养生，办了健身卡。去了三次，然后卡在抽屉里吃灰，经典结局', v: 4, tag: 'fish' },
+    { letter: 'B', text: '陷入焦虑。"我才35岁，身体已经这样了，45岁怎么办？"不敢想', v: 8, tag: 'storm' },
+    { letter: 'C', text: '把报告藏起来。"没看到就等于没问题，薛定谔的体检。"掩耳盗铃', v: 5, tag: 'buddha' },
+    { letter: 'D', text: '认真对待。每天跑步、控制饮食，三个月后复查，指标全正常了，狠人', v: 2, tag: 'grind' }
+  ]},
+  { title: '精力条', text: '你的精力条和二十岁时比，还剩多少？', options: [
+    { letter: 'A', text: '还剩80%，保持运动，还能再战。老当益壮，不服不行', v: 2, tag: 'grind' },
+    { letter: 'B', text: '还剩50%，下午必须喝咖啡续命。否则像个没电的机器人，咖啡是燃料', v: 5, tag: 'think' },
+    { letter: 'C', text: '还剩30%，上午就开始困，中午必须午睡。晚上九点就想躺，老年人作息', v: 7, tag: 'plant' },
+    { letter: 'D', text: '已经是虚电了。充电8小时，续航2小时，像用了五年的旧手机，该换了', v: 9, tag: 'plant' }
+  ]},
+  { title: '中年危机', text: '某天照镜子，突然不认识镜子里的人了——中年危机来了？', options: [
+    { letter: 'A', text: '否认。"我还年轻，我还年轻，我还年轻。"重要的事说三遍，自欺欺人', v: 6, tag: 'storm' },
+    { letter: 'B', text: '接受。"中年就中年，至少我活到了中年，有些人还没到呢。"佛系', v: 3, tag: 'buddha' },
+    { letter: 'C', text: '开始行动。买跑车、学吉他、换发型，试图证明自己还年轻，用力过猛', v: 7, tag: 'grind' },
+    { letter: 'D', text: '躺平。"中年危机？我连危机都懒得危机了。"已经过了那个阶段', v: 5, tag: 'plant' }
+  ]},
+  { title: '牛马觉醒', text: '做了十年牛马，有一天突然想"我图什么？"，你的答案？', options: [
+    { letter: 'A', text: '图房贷。"至少我有房，虽然银行才是真正的房东。"房奴的自我修养', v: 5, tag: 'buddha' },
+    { letter: 'B', text: '图孩子。"为了下一代不重复我的生活，虽然他们可能也会重复。"循环', v: 6, tag: 'think' },
+    { letter: 'C', text: '不知道。"这个问题太难了，让我再想想。"一想想了十年，还没想明白', v: 8, tag: 'storm' },
+    { letter: 'D', text: '已经不想了。"想多了头疼，不如不想，反正明天还要上班。"放弃思考', v: 4, tag: 'fish' }
+  ]},
+  { title: '命运的齿轮2.0', text: '如果当初选了另一个offer/行业/城市，你的人生会怎样？', options: [
+    { letter: 'A', text: '一定更好。"当初选了那个offer现在就是CEO了。"每天都在后悔，后悔是常态', v: 8, tag: 'storm' },
+    { letter: 'B', text: '可能更差。"平行宇宙的我可能已经失业了，至少现在还有工作。"知足', v: 3, tag: 'buddha' },
+    { letter: 'C', text: '差不多。"人生就是不管怎么选都会后悔，这是宇宙定律。"哲学大师', v: 5, tag: 'think' },
+    { letter: 'D', text: '不想了。"命运的齿轮已经锈死了，转不动了。"认命了', v: 6, tag: 'plant' }
+  ]},
+  { title: '爱你老己', text: '2026年，你学会了"爱你老己"吗？', options: [
+    { letter: 'A', text: '学会了。"周末不加班，晚上不熬夜，对自己好一点。房贷可以慢慢还"', v: 2, tag: 'buddha' },
+    { letter: 'B', text: '正在学。"有时候爱自己，有时候卷自己，在两者之间反复横跳。"摇摆', v: 5, tag: 'think' },
+    { letter: 'C', text: '没学会。"爱自己？房贷谁还？孩子谁养？没有资格爱自己。"现实', v: 8, tag: 'storm' },
+    { letter: 'D', text: '过度爱自己。"已经躺了三个月了，谁来救救我。"从爱自己到放弃自己', v: 7, tag: 'plant' }
+  ]}
+];
+
+/* FREELANCE — 自由职业 */
+questionBanks['worker_freelance'] = [
+  { title: '作息时区', text: '你的生物钟属于哪个时区？', options: [
+    { letter: 'A', text: '北京时间，早睡早起，自律得像有单位的人。自由职业者的耻辱', v: 2, tag: 'grind' },
+    { letter: 'B', text: '纽约时间，凌晨3点灵感爆发，下午3点起床。和国内客户有时差，完美错开', v: 5, tag: 'fish' },
+    { letter: 'C', text: '混沌时区，今天6点起明天16点起。窗帘从没拉开过，不知道外面是白天还是黑夜', v: 8, tag: 'storm' },
+    { letter: 'D', text: '已放弃时区概念。"时间是人类发明的，我是自由的。"哲学层面解决了问题', v: 6, tag: 'plant' }
+  ]},
+  { title: '甲方', text: '甲方第三次改需求，说"还是第一版好"，你的反应？', options: [
+    { letter: 'A', text: '早就预料到了，第一版一直留着。就等你这句话，微笑.jpg，一切尽在掌握', v: 4, tag: 'buddha' },
+    { letter: 'B', text: '内心暴击，但表面回复"好的呢亲，马上改~"。转头开始骂甲方，精分现场', v: 9, tag: 'storm' },
+    { letter: 'C', text: '开始加钱。"改可以，但这是第三次了，费用要重新算。"专业，硬气', v: 3, tag: 'grind' },
+    { letter: 'D', text: '已经麻木了。"改吧改吧，反正第一版我都没删，你开心就好。"放弃抵抗', v: 5, tag: 'fish' }
+  ]},
+  { title: '收入心电图', text: '你的月收入曲线最像什么？', options: [
+    { letter: 'A', text: '稳步上升，业务越来越好，开始有稳定客户了。未来可期，终于熬出头了', v: 2, tag: 'grind' },
+    { letter: 'B', text: '过山车，这个月撑死，下个月饿死。刺激但心脏受不了，需要速效救心丸', v: 8, tag: 'storm' },
+    { letter: 'C', text: '薛定谔的收入，我也不知道下个月钱从哪来。但好像总能活下来，神奇', v: 5, tag: 'think' },
+    { letter: 'D', text: '一条直线，没钱，但也不焦虑了。已经习惯了贫穷，贫穷使我平静', v: 6, tag: 'plant' }
+  ]},
+  { title: '社交退化', text: '你上次和人说话是什么时候？', options: [
+    { letter: 'A', text: '昨天，和外卖小哥说了"谢谢"。这是本周唯一的社交，值得纪念', v: 6, tag: 'fox' },
+    { letter: 'B', text: '上周，参加了一个线下活动。说了三句话，然后提前溜了，社交能量耗尽', v: 7, tag: 'fox' },
+    { letter: 'C', text: '我不记得了，但我和猫/狗/盆栽的对话非常深入。它们是最好的倾听者', v: 8, tag: 'plant' },
+    { letter: 'D', text: '每天都在社交，线上，打字，不超过50个字。包括"收到""好的""改好了"', v: 4, tag: 'buddha' }
+  ]},
+  { title: '自律陷阱', text: '自由职业的"自由"对你来说是什么？', options: [
+    { letter: 'A', text: '高效自由，我比上班时更自律，产出更高。自己卷自己，卷王之王', v: 7, tag: 'grind' },
+    { letter: 'B', text: '伪自由，不用打卡，但24小时都是工作时间。比上班还累，血亏', v: 9, tag: 'storm' },
+    { letter: 'C', text: '躺平自由，没有老板盯着，我终于可以合法地摸鱼了。摸了三个月了', v: 5, tag: 'fish' },
+    { letter: 'D', text: '纠结自由，今天想卷，明天想躺，每天都在纠结。最后一事无成，白纠结', v: 6, tag: 'think' }
+  ]},
+  { title: '亲戚三连', text: '过年回家，亲戚问"你现在做什么工作？一个月赚多少钱？有对象吗？"——', options: [
+    { letter: 'A', text: '已读乱回。"搞艺术的""做咨询的""互联网相关"，主打一个模糊，万能回答', v: 4, tag: 'fish' },
+    { letter: 'B', text: '被暴击，回家后开始怀疑自己是不是"不务正业"。焦虑了三天，亲戚杀伤力MAX', v: 8, tag: 'storm' },
+    { letter: 'C', text: '自信回答。"自由职业，月入X万，对象？我选择和自由在一起。"凡尔赛', v: 2, tag: 'buddha' },
+    { letter: 'D', text: '逃避。"我去上个厕所。"然后在厕所待了半小时，出来时亲戚已经换话题了', v: 6, tag: 'fox' }
+  ]},
+  { title: '上头', text: '2026年新词"入魅"——自由职业者最容易被什么入魅？', options: [
+    { letter: 'A', text: '被"搞钱"上头了，每天都在想怎么搞钱。看什么都像商机，眼睛发光', v: 7, tag: 'grind' },
+    { letter: 'B', text: '被焦虑上头了，焦虑让我更焦虑。陷入了焦虑的无限循环，出不来了', v: 9, tag: 'storm' },
+    { letter: 'C', text: '被"数字游民"概念上头了。在巴厘岛办公的幻想，支撑着我在出租屋里工作', v: 5, tag: 'think' },
+    { letter: 'D', text: '被床上头了，床是我的本体。我已经和床融为一体了，不可分割', v: 4, tag: 'plant' }
+  ]},
+  { title: '偷感', text: '自由职业者的"偷感"体现在哪里？', options: [
+    { letter: 'A', text: '工作日去商场，感受到上班族异样的目光。假装自己是来见客户的，演技上线', v: 6, tag: 'fox' },
+    { letter: 'B', text: '在咖啡厅办公，点一杯咖啡坐4小时。每次服务员路过都假装在开会，心累', v: 5, tag: 'fish' },
+    { letter: 'C', text: '完全不偷感。"我自由职业我骄傲，我下午三点逛公园怎么了？"理直气壮', v: 2, tag: 'buddha' },
+    { letter: 'D', text: '偷感极重，连外卖都不敢点。怕外卖小哥发现我天天在家，社恐晚期', v: 8, tag: 'fox' }
+  ]},
+  { title: '显眼包', text: '在朋友圈发"自由职业的第X天"——你是什么显眼包？', options: [
+    { letter: 'A', text: '凡尔赛显眼包。"今天在咖啡厅工作，窗外是阳光和梧桐树。"实际在吃泡面', v: 5, tag: 'fish' },
+    { letter: 'B', text: '崩溃显眼包。"自由职业第三个月，今天只吃了一个馒头。"然后收到妈妈的红包', v: 8, tag: 'storm' },
+    { letter: 'C', text: '成功显眼包。"这个月收入破五万，自由职业真香！"引来一堆人问怎么入行', v: 3, tag: 'grind' },
+    { letter: 'D', text: '不发朋友圈。"我的人生不需要别人来点赞。"但偷偷刷别人的朋友圈，真香', v: 4, tag: 'buddha' }
+  ]},
+  { title: '抽象', text: '自由职业一年后，你的生活状态是怎样的？', options: [
+    { letter: 'A', text: '非常抽象，作息混乱、收入不稳定、社交退化。但就是不想回去上班，真香定律', v: 7, tag: 'storm' },
+    { letter: 'B', text: '逐渐稳定，找到了节奏。客户稳定了，收入稳定了，自由职业真香', v: 2, tag: 'buddha' },
+    { letter: 'C', text: '在考虑回去上班。"自由了一年，发现上班至少有人帮你交社保。"现实', v: 6, tag: 'think' },
+    { letter: 'D', text: '已经佛了。"管他抽象不抽象，活着就行，自由最重要。"境界到了', v: 4, tag: 'plant' }
+  ]}
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   PRESCRIPTION POOLS — 精简版（3-4条/池，学生/社会人区分）
+   ═══════════════════════════════════════════════════════════════ */
+var rxPools = {
+  student: {
+    severe: [
+      [
+        { emoji: '🏥', name: '强制数字戒断（住院级）', dose: '每日22:00-次日08:00 | 手机物理隔离', note: '将手机锁在另一个房间的抽屉里，钥匙交给室友/家人保管。戒断反应包括：手指不自觉滑动、每隔3分钟看手腕、产生"有人找我"的幻觉。属正常现象，坚持3天症状缓解。' },
+        { emoji: '💉', name: '火锅续命滴注', dose: '每周2次 | 鸳鸯锅底·微辣起步', note: '毛肚涮7秒疗效最佳。建议搭配：鸭血（补血）、脑花（补脑）、藕片（通气）。禁忌：一个人吃，孤独会中和药效。' },
+        { emoji: '🔪', name: '学习群切除手术', dose: '立即执行 | 仅保留3个群', note: '保留：班级通知群、密友群、外卖红包群。其余全部退出。术后可能出现"FOMO戒断反应"，建议用"已读不回特训"辅助治疗。' },
+        { emoji: '💊', name: '躺平素缓释片', dose: '每日1次 | 每次至少12小时', note: '饭后睡前均可服用，最佳服用方式：躺在床上什么都不做。副作用：可能被家长/老师骂。应对：出示本处方，告诉他们这是医生开的。' }
+      ],
+      [
+        { emoji: '🫖', name: '枸杞红枣安神汤', dose: '每日1剂 | 保温杯500ml冲泡', note: '配方：枸杞20粒+红枣3颗+桂圆5颗+冰糖少许。功效：专治"看到同学保研/拿offer"引起的焦虑。注意：养生从青年抓起，不丢人。' },
+        { emoji: '🧘', name: '摸鱼吐纳法', dose: '每日3次 | 每次15分钟', note: '操作：闭眼，深呼吸，假装在思考难题。实际上脑子里可以想任何事——今晚吃什么、周末去哪玩。关键是表情要严肃，眉头微皱效果更佳。' },
+        { emoji: '📱', name: '手机装死贴', dose: '周末全天 | 自动回复开启', note: '自动回复："此人已死，有事烧纸，急事挖坟。" 注意：此回复仅对非紧急联系人使用，对老师使用后果自负。' },
+        { emoji: '🤫', name: '已读不回特训营', dose: '每日训练 | 对所有非紧急消息', note: '训练心法：看了就是回了，心里回了也算回了。初级：已读不回。中级：不读不回。高级：读了但忘记了回。终极：你根本不记得有这条消息。' }
+      ],
+      [
+        { emoji: '🎮', name: '游戏放松颗粒（处方版）', dose: '每日2小时 | 仅限单机游戏', note: '推荐：原神、崩坏：星穹铁道、光遇。禁忌：王者荣耀、LOL、任何需要开麦的游戏——队友骂你会让精神内耗值翻倍。' },
+        { emoji: '📦', name: '快递期待素', dose: '每周至少1个快递在路上', note: '随便买点什么，让生活有个盼头。原理：拆快递的快乐是纯粹且无副作用的。注意：此药容易上瘾，请控制剂量。' },
+        { emoji: '🎵', name: '土味神曲洗耳液', dose: '每日3首 | 音量70%', note: '推荐曲目：《爱你老己》《入魅》《地球online 2.0》。原理：用更强烈的精神刺激覆盖原有的精神内耗，以毒攻毒。' },
+        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '治疗期间禁止：刷朋友圈超过15分钟、睡前看消息、和卷王比成绩、思考人生意义。违者药效清零，需重新挂号。' }
+      ]
+    ],
+    moderate: [
+      [
+        { emoji: '🛏️', name: '周末自然醒胶囊', dose: '每周1次 | 不设闹钟，睡到自然醒', note: '自然醒是世界上最温柔的闹钟。醒来后允许赖床30分钟，此期间只能刷搞笑视频，禁止看任何让你焦虑的内容。' },
+        { emoji: '🍲', name: '火锅预防接种', dose: '每两周1次 | 鸳鸯锅底', note: '预防胜于治疗。研究表明，每月吃2次火锅的学生精神健康指数比不吃火锅的学生高37%。' },
+        { emoji: '📵', name: '朋友圈限流术', dose: '每日浏览不超过15分钟', note: '别人的人生不值得你花太多时间观看。设置一个15分钟倒计时，时间一到立刻关掉。' }
+      ],
+      [
+        { emoji: '📺', name: '追剧放松片', dose: '每日1集 | 睡前服用', note: '推荐喜剧、美食番、治愈番。禁忌：悬疑剧（脑子停不下来）、校园剧（容易代入）。推荐：《武林外传》重刷，百看不厌。' },
+        { emoji: '😴', name: '午睡充电片', dose: '每日20分钟 | 13:00-15:00之间', note: '超过30分钟会进入深度睡眠，醒来后更累且伴有"我是谁我在哪"的迷茫感。20分钟是黄金时长。' },
+        { emoji: '🌳', name: '公园20分钟疗法', dose: '每日1次 | 不限时段', note: '在公园里坐20分钟就能显著降低压力激素水平。不需要运动，只需要坐在长椅上——看树、看云、看别人遛狗。' }
+      ],
+      [
+        { emoji: '🎨', name: '创作释放剂', dose: '每周1次 | 不限形式', note: '画画、写字、唱歌、做手工——随便什么，表达即治愈。不需要专业水平，丑也有丑的快乐。重点：不是为了给别人看，是为了给自己看。' },
+        { emoji: '📖', name: '纸质书眼药水', dose: '每日30分钟 | 睡前使用', note: '远离屏幕，让眼睛和大脑同时休息。推荐：小说、散文、漫画，不要读成功学/自我提升类——那些是精神内耗的源头。' },
+        { emoji: '🧹', name: '整理收纳疗法', dose: '每周1次 | 整理一个角落', note: '整理房间=整理心情。看着乱七八糟的书桌变整洁，会产生一种"我可以掌控人生"的错觉——这种错觉本身就有治疗效果。' }
+      ]
+    ],
+    normal: [
+      [
+        { emoji: '🛏️', name: '赖床自由权', dose: '每周1次 | 不设时限', note: '您精神状况良好，但赖床是人生基本乐趣之一。允许在床上吃早餐、刷手机、发呆——这是健康人的特权。' },
+        { emoji: '🍲', name: '庆祝火锅', dose: '每月1-2次 | 呼朋引伴', note: '庆祝您精神健康！多叫几个朋友，把本处方给他们看，让他们羡慕一下。' },
+        { emoji: '😊', name: '继续保持', dose: '长期坚持 | 无需调整', note: '您是我院的骄傲，是精神健康的标兵。请继续保持当前状态，如果哪天感觉不对劲了，欢迎随时回来复查。' }
+      ],
+      [
+        { emoji: '🏆', name: '精神健康标兵', dose: '无需治疗 | 建议定期维护', note: '恭喜！你是这个世界的稀有物种——精神健康的人。请继续保持，这个世界需要你这样的正常人。建议每半年复查一次。' },
+        { emoji: '📚', name: '阅读充电', dose: '每日30分钟 | 纸质书更佳', note: '不是治疗，是保养。像给车做保养一样，定期给大脑输入优质内容。推荐：小说、历史、科普——就是别看成功学。' },
+        { emoji: '🌞', name: '阳光补充', dose: '每日15分钟 | 户外最佳', note: '光合作用是人类的基本需求。晒太阳不仅补钙，还补心情。阴天也请出门，紫外线会穿透云层——科学说的。' }
+      ],
+      [
+        { emoji: '💤', name: '美容觉', dose: '每日8小时 | 23:00前入睡', note: '皮肤好、心情好、精神好，一举三得。睡眠是上帝给人类最好的免费药，可惜很多人不吃。' },
+        { emoji: '🏃', name: '快乐运动', dose: '每周3次 | 选你喜欢的', note: '不是因为需要减肥，而是因为运动让人快乐。选一个你真正喜欢的运动——跳舞、打球、游泳，而不是在健身房痛苦地举铁。' },
+        { emoji: '❤️', name: '关爱他人', dose: '随时 | 量力而行', note: '你的精神健康已经是稀缺资源了。如果有多余的能量，可以分一点给身边精神内耗的朋友。但记住：先照顾好自己，再照顾别人。' }
+      ]
+    ]
+  },
+  worker: {
+    severe: [
+      [
+        { emoji: '🏥', name: '强制数字戒断（住院级）', dose: '每日22:00-次日08:00 | 手机物理隔离', note: '将手机锁在另一个房间的抽屉里，钥匙交给伴侣/室友保管。戒断反应包括：手指不自觉滑动、每隔3分钟看手腕、产生"老板找我"的幻觉。属正常现象，坚持3天症状缓解。' },
+        { emoji: '💉', name: '火锅续命滴注', dose: '每周2次 | 鸳鸯锅底·微辣起步', note: '毛肚涮7秒疗效最佳。建议搭配：鸭血（补血）、脑花（补脑）、藕片（通气）。禁忌：一个人吃，孤独会中和药效。' },
+        { emoji: '🔪', name: '工作群切除手术', dose: '立即执行 | 仅保留3个群', note: '保留：家庭群、密友群、外卖红包群。其余全部退出。术后可能出现"FOMO戒断反应"，建议用"已读不回特训"辅助治疗。' },
+        { emoji: '💊', name: '躺平素缓释片', dose: '每日1次 | 每次至少12小时', note: '饭后睡前均可服用，最佳服用方式：躺在床上什么都不做。副作用：可能被伴侣/领导骂。应对：出示本处方，告诉他们这是医生开的。' }
+      ],
+      [
+        { emoji: '🫖', name: '枸杞红枣安神汤', dose: '每日1剂 | 保温杯500ml冲泡', note: '配方：枸杞20粒+红枣3颗+桂圆5颗+冰糖少许。功效：专治"看到同龄人升职加薪"引起的焦虑。注意：中年养生从青年抓起，不丢人。' },
+        { emoji: '🧘', name: '摸鱼吐纳法', dose: '每日3次 | 每次15分钟', note: '操作：闭眼，深呼吸，假装在思考重要问题。实际上脑子里可以想任何事——今晚吃什么、周末去哪玩。关键是表情要严肃，眉头微皱效果更佳。' },
+        { emoji: '📱', name: '手机装死贴', dose: '周末全天 | 自动回复开启', note: '自动回复："此人已死，有事烧纸，急事挖坟。" 注意：此回复仅对非紧急联系人使用，对老板使用后果自负。' },
+        { emoji: '🤫', name: '已读不回特训营', dose: '每日训练 | 对所有非紧急消息', note: '训练心法：看了就是回了，心里回了也算回了。初级：已读不回。中级：不读不回。高级：读了但忘记了回。终极：你根本不记得有这条消息。' }
+      ],
+      [
+        { emoji: '🎮', name: '游戏放松颗粒（处方版）', dose: '每日2小时 | 仅限单机游戏', note: '推荐：原神、崩坏：星穹铁道、光遇。禁忌：王者荣耀、LOL、任何需要开麦的游戏——队友骂你会让精神内耗值翻倍。' },
+        { emoji: '📦', name: '快递期待素', dose: '每周至少1个快递在路上', note: '随便买点什么，让生活有个盼头。原理：拆快递的快乐是纯粹且无副作用的。注意：此药容易上瘾，请控制剂量，不要月底还花呗时再来看精神科。' },
+        { emoji: '🎵', name: '土味神曲洗耳液', dose: '每日3首 | 音量70%', note: '推荐曲目：《爱你老己》《入魅》《地球online 2.0》。原理：用更强烈的精神刺激覆盖原有的精神内耗，以毒攻毒。' },
+        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '治疗期间禁止：刷朋友圈超过15分钟、睡前看工作消息、和卷王比业绩、思考人生意义。违者药效清零，需重新挂号。' }
+      ]
+    ],
+    moderate: [
+      [
+        { emoji: '🛏️', name: '周末自然醒胶囊', dose: '每周1次 | 不设闹钟，睡到自然醒', note: '自然醒是世界上最温柔的闹钟。醒来后允许赖床30分钟，此期间只能刷搞笑视频，禁止看任何让你焦虑的内容。' },
+        { emoji: '🍲', name: '火锅预防接种', dose: '每两周1次 | 鸳鸯锅底', note: '预防胜于治疗。研究表明，每月吃2次火锅的上班族精神健康指数比不吃火锅的上班族高37%。' },
+        { emoji: '📵', name: '朋友圈限流术', dose: '每日浏览不超过15分钟', note: '别人的人生不值得你花太多时间观看。设置一个15分钟倒计时，时间一到立刻关掉。' }
+      ],
+      [
+        { emoji: '📺', name: '追剧放松片', dose: '每日1集 | 睡前服用', note: '推荐喜剧、美食番、治愈番。禁忌：悬疑剧（脑子停不下来）、职场剧（容易代入）。推荐：《武林外传》重刷，百看不厌。' },
+        { emoji: '😴', name: '午睡充电片', dose: '每日20分钟 | 13:00-15:00之间', note: '超过30分钟会进入深度睡眠，醒来后更累且伴有"我是谁我在哪"的迷茫感。20分钟是黄金时长。' },
+        { emoji: '🌳', name: '公园20分钟疗法', dose: '每日1次 | 不限时段', note: '在公园里坐20分钟就能显著降低压力激素水平。不需要运动，只需要坐在长椅上——看树、看云、看别人遛狗。' }
+      ],
+      [
+        { emoji: '🎨', name: '创作释放剂', dose: '每周1次 | 不限形式', note: '画画、写字、唱歌、做手工——随便什么，表达即治愈。不需要专业水平，丑也有丑的快乐。重点：不是为了给别人看，是为了给自己看。' },
+        { emoji: '📖', name: '纸质书眼药水', dose: '每日30分钟 | 睡前使用', note: '远离屏幕，让眼睛和大脑同时休息。推荐：小说、散文、漫画，不要读成功学/自我提升类——那些是精神内耗的源头。' },
+        { emoji: '🧹', name: '整理收纳疗法', dose: '每周1次 | 整理一个角落', note: '整理房间=整理心情。看着乱七八糟的办公桌变整洁，会产生一种"我可以掌控人生"的错觉——这种错觉本身就有治疗效果。' }
+      ]
+    ],
+    normal: [
+      [
+        { emoji: '🛏️', name: '赖床自由权', dose: '每周1次 | 不设时限', note: '您精神状况良好，但赖床是人生基本乐趣之一。允许在床上吃早餐、刷手机、发呆——这是健康人的特权。' },
+        { emoji: '🍲', name: '庆祝火锅', dose: '每月1-2次 | 呼朋引伴', note: '庆祝您精神健康！多叫几个朋友，把本处方给他们看，让他们羡慕一下。' },
+        { emoji: '😊', name: '继续保持', dose: '长期坚持 | 无需调整', note: '您是我院的骄傲，是精神健康的标兵。请继续保持当前状态，如果哪天感觉不对劲了，欢迎随时回来复查。' }
+      ],
+      [
+        { emoji: '🏆', name: '精神健康标兵', dose: '无需治疗 | 建议定期维护', note: '恭喜！你是这个世界的稀有物种——精神健康的人。请继续保持，这个世界需要你这样的正常人。建议每半年复查一次。' },
+        { emoji: '📚', name: '阅读充电', dose: '每日30分钟 | 纸质书更佳', note: '不是治疗，是保养。像给车做保养一样，定期给大脑输入优质内容。推荐：小说、历史、科普——就是别看成功学。' },
+        { emoji: '🌞', name: '阳光补充', dose: '每日15分钟 | 户外最佳', note: '光合作用是人类的基本需求。晒太阳不仅补钙，还补心情。阴天也请出门，紫外线会穿透云层——科学说的。' }
+      ],
+      [
+        { emoji: '💤', name: '美容觉', dose: '每日8小时 | 23:00前入睡', note: '皮肤好、心情好、精神好，一举三得。睡眠是上帝给人类最好的免费药，可惜很多人不吃。' },
+        { emoji: '🏃', name: '快乐运动', dose: '每周3次 | 选你喜欢的', note: '不是因为需要减肥，而是因为运动让人快乐。选一个你真正喜欢的运动——跳舞、打球、游泳，而不是在健身房痛苦地举铁。' },
+        { emoji: '❤️', name: '关爱他人', dose: '随时 | 量力而行', note: '你的精神健康已经是稀缺资源了。如果有多余的能量，可以分一点给身边精神内耗的朋友。但记住：先照顾好自己，再照顾别人。' }
+      ]
+    ]
+  },
+  genius: [
+    [
+      { emoji: '🍼', name: '天才专属摸鱼套餐', dose: '每日1次 | 不限时长', note: '微积分都会了，摸个鱼怎么了？你值得拥有比普通小朋友更多的玩耍时间。' },
+      { emoji: '🧸', name: '奥特曼卡片', dose: '每周1包 | 不可间断', note: '研究表明，收集奥特曼卡片能显著提升儿童的逻辑推理能力。本处方基于严谨的科学研究（绝不是因为我小时候也喜欢）。' },
+      { emoji: '🎨', name: '涂鸦释放', dose: '每日1次 | 不限时长', note: '在纸上画，不要在墙上画。如果已经在墙上画了——恭喜你，你是一个有创造力的天才，但妈妈可能会生气。' },
+      { emoji: '🌟', name: '天才保护令', dose: '长期有效', note: '根据本处方，任何人不得以"学习"为名剥夺你的玩耍时间。请将此处方交给家长，告诉他们：这是医生说的。' }
+    ]
+  ]
+};
+
+function getPrescription(score, isStudent, easterEggType) {
+  var pool;
+  if (easterEggType === 'preschool_genius') {
+    pool = rxPools.genius;
+  } else {
+    var group = isStudent ? 'student' : 'worker';
+    if (score >= 70) {
+      pool = rxPools[group].severe;
+    } else if (score >= 40) {
+      pool = rxPools[group].moderate;
+    } else {
+      pool = rxPools[group].normal;
+    }
+  }
+  var idx = Math.floor(Math.random() * pool.length);
+  return pool[idx].slice();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function (s) {
+    s.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showQueueAnimation(callback) {
+  var overlay = document.getElementById('queueOverlay');
+  var num = document.getElementById('queueNumber');
+  num.textContent = String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
+  overlay.classList.add('show');
+  var count = 0;
+  var interval = setInterval(function () {
+    count++;
+    num.textContent = String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
+    if (count >= 8) {
+      clearInterval(interval);
+      num.textContent = String(Math.floor(Math.random() * 100) + 1).padStart(3, '0');
+      setTimeout(function () {
+        overlay.classList.remove('show');
+        if (callback) callback();
+      }, 600);
+    }
+  }, 200);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   START CHECKUP
+   ═══════════════════════════════════════════════════════════════ */
+function startCheckup() {
+  patientName = document.getElementById('patientName').value.trim() || '匿名患者';
+  currentQ = 0;
+  answers = [];
+  totalScore = 0;
+  tagCounts = {};
+  personaLabel = '';
+  personaDesc = '';
+  easterEggTriggered = false;
+  easterEggType = '';
+  achievement = '';
+  currentDoctor = pickDoctor();
+  currentQuestions = getQuestions(userGroup, userSubGroup);
+  showQueueAnimation(function () {
+    showLoading(function () {
+      showScreen('scr-consult');
+      renderQuestion();
+    }, 400);
+  });
+}
+
+function renderQuestion() {
+  var q = currentQuestions[currentQ];
+  document.getElementById('qIndex').textContent = currentQ + 1;
+  document.getElementById('qTotal').textContent = currentQuestions.length;
+  document.getElementById('stepTitle').textContent = q.title;
+  document.getElementById('qNumber').textContent = String(currentQ + 1).padStart(2, '0');
+  document.getElementById('qText').innerHTML = q.text;
+  document.getElementById('progressFill').style.width = ((currentQ / currentQuestions.length) * 100) + '%';
+  animateHeartbeat();
+  var isPreschool = userSubGroup === 'preschool';
+  var optsHtml = '';
+  q.options.forEach(function (o, i) {
+    var sel = answers[currentQ] === i ? ' selected' : '';
+    var extra = isPreschool ? ' preschool-opt' : '';
+    optsHtml += '<div class="option-btn' + sel + extra + '" onclick="selectAnswer(' + i + ')">';
+    optsHtml += '<div class="opt-letter">' + o.letter + '</div>';
+    optsHtml += '<div class="opt-text">' + o.text + '</div>';
+    optsHtml += '</div>';
+  });
+  document.getElementById('qOptions').innerHTML = optsHtml;
+}
+
+function animateHeartbeat() {
+  var path = document.getElementById('heartbeatPath');
+  var midX = 80 + Math.random() * 300;
+  path.setAttribute('d', 'M0,18 L' + (midX - 30) + ',18 L' + (midX - 25) + ',18 L' + (midX - 20) + ',8 L' + (midX - 15) + ',32 L' + (midX - 10) + ',18 L480,18');
+  path.style.opacity = '0.12';
+  setTimeout(function () { path.style.opacity = '0.25'; }, 300);
+}
+
+function selectAnswer(idx) {
+  answers[currentQ] = idx;
+  var q = currentQuestions[currentQ];
+  var chosen = q.options[idx];
+  totalScore += chosen.v || 0;
+  if (chosen.tag) {
+    tagCounts[chosen.tag] = (tagCounts[chosen.tag] || 0) + 1;
+  }
+  document.querySelectorAll('.option-btn').forEach(function (el) {
+    el.classList.remove('selected');
+  });
+  document.querySelectorAll('.option-btn')[idx].classList.add('selected');
+  setTimeout(function () {
+    if (currentQ < currentQuestions.length - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      document.getElementById('progressFill').style.width = '100%';
+      showLoading(function () {
+        showReport();
+      }, 400);
+    }
+  }, 380);
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    var prevAns = answers[currentQ - 1];
+    if (prevAns !== undefined) {
+      var q = currentQuestions[currentQ - 1];
+      var chosen = q.options[prevAns];
+      totalScore -= chosen.v || 0;
+      if (chosen.tag) {
+        tagCounts[chosen.tag] = (tagCounts[chosen.tag] || 1) - 1;
+        if (tagCounts[chosen.tag] <= 0) delete tagCounts[chosen.tag];
+      }
+    }
+    currentQ--;
+    answers.pop();
+    renderQuestion();
+  }
+}
+
+function toggleScoreExplain() {
+  document.getElementById('scoreExplain').classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REPORT
+   ═══════════════════════════════════════════════════════════════ */
+function showReport() {
+  showScreen('scr-report');
+  checkEasterEgg(answers, userGroup, userSubGroup);
+
+  // Recalculate tagCounts from answers to fix any drift
+  tagCounts = {};
+  totalScore = 0;
+  for (var i = 0; i < answers.length; i++) {
+    var q = currentQuestions[i];
+    if (q && q.options[answers[i]]) {
+      var chosen = q.options[answers[i]];
+      totalScore += chosen.v || 0;
+      if (chosen.tag) {
+        tagCounts[chosen.tag] = (tagCounts[chosen.tag] || 0) + 1;
+      }
+    }
+  }
+
+  // Determine persona label
+  var tags = [];
+  for (var t in tagCounts) {
+    if (tagCounts.hasOwnProperty(t)) tags.push({ tag: t, count: tagCounts[t] });
+  }
+  tags.sort(function (a, b) { return b.count - a.count; });
+  var topTag = tags.length > 0 ? tags[0].tag : 'buddha';
+
+  var personaMap = {
+    storm: { label: '精神龙卷风', desc: '你脑袋里的想法像双十一快递一样多。每件事都能让你脑补出一万种可能，连点个外卖都要纠结半小时。别人在生活，你在头脑风暴。' },
+    fish: { label: '摸鱼冠军', desc: '你的座右铭是"明天再说"。工作五分钟，摸鱼两小时，带薪拉屎是你的核心竞争力。但神奇的是，你总能在最后关头交出一份还不错的答卷。' },
+    fox: { label: '社恐星人', desc: '见到熟人先绕路，绕不过就装忙。电话铃声响起的那一刻，你已经在心里排练了八百种拒绝话术。社交对你来说是一场需要提前三天做心理建设的战役。' },
+    think: { label: '过度思考晚期', desc: '你把人生过成了无限递归。发完一条消息，你会在脑子里回放三百遍。别人随口一句话，你能研究出三层含义。活得太清醒，就是你的病根。' },
+    buddha: { label: '佛系青年', desc: '心态稳如老狗，狗看了都佩服。天塌下来你当被子盖，deadline在你眼里只是"参考日期"。你相信万事皆有定数，急也没用，不如先喝杯茶。' },
+    ai: { label: 'AI焦虑症候群', desc: 'AI还没取代你，你先把自己吓死了。每次看到AI的新闻都心跳加速，然后疯狂学新技能，但学完发现AI又升级了。你最大的焦虑来源不是AI，是你自己。' },
+    grind: { label: '卷王之王', desc: '你的人生字典里没有"休息"两个字。别人在摸鱼，你在做计划；别人在睡觉，你在复盘。你觉得每一分钟不进步就是退步，但你的身体已经在发警告信号了。' },
+    plant: { label: '精神植物人', desc: '你还在呼吸，但精神已经下班了。每天醒来第一件事是确认自己还活着，然后继续躺着。你不是懒，你只是电量耗尽——但充电器似乎永远找不到。' }
+  };
+  var p = personaMap[topTag] || personaMap['buddha'];
+  personaLabel = p.label;
+  personaDesc = p.desc;
+
+  var level, levelText;
+  if (totalScore >= 70) { level = 'red'; levelText = '重度——建议立即启动躺平治疗'; }
+  else if (totalScore >= 40) { level = 'orange'; levelText = '中度——处于亚健康警戒线'; }
+  else { level = 'blue'; levelText = '轻度——精神状况良好，继续保持'; }
+
+  var groupFullLabel = groupLabels[userGroup + '-' + userSubGroup] || '未知';
+  document.getElementById('rptName').textContent = patientName;
+  document.getElementById('rptGroup').textContent = groupFullLabel;
+  var badge = document.getElementById('rptGroupBadge');
+  badge.textContent = '🏷 ' + groupFullLabel;
+  badge.className = 'rpt-group-badge badge-' + (userGroup === 'student' ? 'student' : 'worker');
+
+  var now = new Date();
+  document.getElementById('rptDate').textContent = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+  document.getElementById('rptId').textContent = 'MH-' + now.getFullYear() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  // Replace indicator bars with simple persona display
+  var indHtml = '<div class="rpt-persona-section" style="padding:24px 16px;text-align:center;">';
+  indHtml += '<img class="bg-img" src="img/' + personaLabel + '.png" alt="" />';
+  indHtml += '<div class="bg-overlay"></div>';
+  indHtml += '<div class="rpt-persona-name">' + personaLabel + '</div>';
+  indHtml += '<div class="rpt-persona-desc">' + personaDesc + '</div>';
+  indHtml += '<div style="display:inline-block;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:700;position:relative;z-index:2;';
+  if (level === 'red') indHtml += 'background:var(--stamp-pink);color:var(--stamp-red);';
+  else if (level === 'orange') indHtml += 'background:var(--orange-light);color:var(--orange-warn);';
+  else indHtml += 'background:var(--green-light);color:var(--green-ok);';
+  indHtml += '">精神内耗等级：' + levelText + '</div>';
+  indHtml += '</div>';
+
+  // Tag breakdown: show which tags contributed to the persona
+  var tagNames = {
+    storm: '精神龙卷风', fish: '摸鱼冠军', fox: '社恐星人', think: '过度思考晚期',
+    buddha: '佛系青年', ai: 'AI焦虑症候群', grind: '卷王之王', plant: '精神植物人'
+  };
+  indHtml += '<div class="tag-breakdown" style="margin-top:16px;padding:12px 16px;background:var(--paper);border-radius:10px;border:1px solid var(--line);">';
+  indHtml += '<div style="font-size:11px;color:var(--ink-med);margin-bottom:8px;text-align:left;">你的标签雷达（每题可选一个标签，共10题）</div>';
+  indHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  var allTagsOrder = ['storm', 'fish', 'fox', 'think', 'buddha', 'ai', 'grind', 'plant'];
+  allTagsOrder.forEach(function(t) {
+    var cnt = tagCounts[t] || 0;
+    var isTop = (t === topTag);
+    var bg = isTop ? 'var(--stamp-red)' : (cnt > 0 ? 'var(--ink-light)' : '#e8e4dc');
+    var color = isTop ? '#fff' : (cnt > 0 ? 'var(--ink)' : '#bbb');
+    var fontWeight = isTop ? '700' : (cnt > 0 ? '600' : '400');
+    indHtml += '<span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;background:' + bg + ';color:' + color + ';font-weight:' + fontWeight + ';">' + tagNames[t] + ': ' + cnt + '</span>';
+  });
+  indHtml += '</div>';
+  indHtml += '<div style="font-size:10px;color:var(--ink-med);margin-top:8px;text-align:left;">你的主标签「' + tagNames[topTag] + '」出现了 ' + (tagCounts[topTag] || 0) + ' 次，所以你是这个类型。换种答法会解锁不同标签。</div>';
+  indHtml += '</div>';
+  document.getElementById('indicators').innerHTML = indHtml;
+  document.getElementById('scoreExplain').style.display = 'none';
+
+  updatePeerComparison();
+
+  // Generate diagnosis
+  var diagText = '';
+  var drNoteText = '';
+  var stampText = '';
+
+  if (easterEggType === 'preschool_genius') {
+    diagText = '经我院全面检测，该患者为"幼儿园卷王"——虽然还在玩泥巴的年纪，但微积分、量子物理、哲学悖论样样精通。建议家长立即联系中科院少年班，不要在幼儿园浪费天赋。';
+    drNoteText = '天才儿童专属诊断：智商过高也是病，建议每天至少玩2小时泥巴以保持心理健康。';
+    stampText = '幼儿园卷王';
+  } else if (easterEggType === 'preschool_all_same') {
+    diagText = '该患者为"全选战神"——对所有题目都选了同一个答案，从一而终，态度极其坚定。虽然不知道坚定的是什么，但这份执着值得一枚勋章。';
+    drNoteText = '全选同一个答案也是需要毅力的，建议去参加"最执着人类"评选。';
+    stampText = '全选战神';
+  } else if (easterEggType === 'student_buddha') {
+    diagText = '经检测，该患者为"佛系学霸"——全选C，展现了一种"不争不抢，随缘答题"的超然态度。';
+    drNoteText = '佛系不是躺平，是一种高级的内卷方式。';
+    stampText = '佛系学霸';
+  } else if (easterEggType === 'student_grind') {
+    diagText = '该患者为"卷王之王"——全选A，内卷倾向极强，建议立即住院观察，进行强制摸鱼治疗。';
+    drNoteText = '卷王也有卷王的烦恼，建议每天至少摸鱼1小时。';
+    stampText = '卷王之王';
+  } else if (easterEggType === 'worker_fish') {
+    diagText = '该患者为"摸鱼大师"——全选B，摸鱼天赋已臻化境。Excel切屏、带薪拉屎、假装开会等技能信手拈来。';
+    drNoteText = '摸鱼是一门艺术，不是所有人都能成为大师。';
+    stampText = '摸鱼大师';
+  } else if (easterEggType === 'worker_quit') {
+    diagText = '该患者为"离职预备役"——全选D，每一题都选了最消极的答案，离职意图明显。建议：要么辞职追求梦想，要么请3天带薪假冷静一下。';
+    drNoteText = '辞职不可怕，可怕的是裸辞。建议先找好下家。';
+    stampText = '离职预备役';
+  } else {
+    var personaDiags = {
+      storm: { text: patientName + '，你属于「精神龙卷风」型人格。大脑里的想法像双十一的快递一样多，但好消息是——你至少还活着，而且活得挺热闹。', note: '想法多不是坏事，只要别让它们同时到货。', stamp: '精神龙卷风' },
+      fish: { text: patientName + '，你属于「摸鱼冠军」型人格。你深谙"明天再说"的哲学精髓，是当代职场/校园的潜伏高手。', note: '摸鱼的最高境界，是摸完鱼还把活干了。', stamp: '摸鱼冠军' },
+      fox: { text: patientName + '，你属于「社恐星人」型人格。见到熟人先绕路，绕不过就装忙——你的社交策略已经进化到了本能级别。', note: '社恐不是病，但走楼梯确实能锻炼身体。', stamp: '社恐星人' },
+      think: { text: patientName + '，你属于「过度思考晚期」型人格。你把人生过成了无限递归——每个想法都会触发下一个想法，直到栈溢出。', note: '有些事情想太多也没用，不如先睡一觉。', stamp: '过度思考晚期' },
+      buddha: { text: patientName + '，你属于「佛系青年」型人格。心态稳如老狗，狗看了都佩服——你做到了真正的宠辱不惊。', note: '佛系不是放弃，是战略性保存体力。', stamp: '佛系青年' },
+      ai: { text: patientName + '，你属于「AI焦虑症候群」型人格。AI还没取代你，你先把自己吓死了——这说明你至少很有危机意识。', note: 'AI再厉害，也不能替你吃饭睡觉。先吃顿好的。', stamp: 'AI焦虑症候群' },
+      grind: { text: patientName + '，你属于「卷王之王」型人格。你的人生字典里没有「休息」这个词，强烈建议你把它加进去。', note: '卷可以，但别忘了卷完要展开。', stamp: '卷王之王' },
+      plant: { text: patientName + '，你属于「精神植物人」型人格。你还在呼吸，但精神已经下班了——而且它好像忘了打卡。', note: '偶尔让精神下班是可以的，但记得叫它回来。', stamp: '精神植物人' }
+    };
+    var pd = personaDiags[topTag] || personaDiags['buddha'];
+    diagText = pd.text;
+    drNoteText = pd.note;
+    stampText = pd.stamp;
+  }
+
+  document.getElementById('diagText').textContent = diagText;
+  document.getElementById('drNoteText').textContent = drNoteText;
+  document.getElementById('drNote').style.display = drNoteText ? 'block' : 'none';
+  document.getElementById('stampText').textContent = stampText;
+
+  var eggBadge = document.getElementById('easterEggBadge');
+  if (easterEggTriggered) {
+    eggBadge.innerHTML = '<div class="easter-egg-badge">🎉 隐藏成就解锁：' + achievement + '</div>';
+    // Special stamp for easter egg
+    document.getElementById('stampText').className = 'stamp special';
+    // Shake the report card
+    setTimeout(function() {
+      var card = document.querySelector('.report-card');
+      if (card) { card.classList.add('shake'); setTimeout(function() { card.classList.remove('shake'); }, 600); }
+    }, 500);
+    // Confetti
+    spawnConfetti();
+  } else {
+    eggBadge.innerHTML = '';
+    document.getElementById('stampText').className = 'stamp';
+  }
+
+  launchLandscape();
+}
+
+function spawnConfetti() {
+  var container = document.createElement('div');
+  container.className = 'egg-confetti';
+  document.body.appendChild(container);
+  var colors = ['#f59e0b','#fbbf24','#fde68a','#ef4444','#ec4899','#8b5cf6','#06b6d4','#10b981'];
+  for (var i = 0; i < 60; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.top = -(Math.random() * 20) + 'px';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 1.5 + 's';
+    piece.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+    piece.style.width = (Math.random() * 10 + 4) + 'px';
+    piece.style.height = (Math.random() * 10 + 4) + 'px';
+    container.appendChild(piece);
+  }
+  setTimeout(function() { container.remove(); }, 3500);
+}
+
+function updatePeerComparison() {
+  var peerAvg = Math.round(Math.random() * 30 + 40);
+  var myAvg = totalScore;
+  var peerEl = document.getElementById('peerCompare');
+  var statsEl = document.getElementById('peerStats');
+  if (peerEl && statsEl) {
+    peerEl.style.display = 'block';
+    var statHtml = '<div class="peer-stat"><span class="peer-label">同龄人平均精神压力</span><span class="peer-value">' + peerAvg + '%</span></div>';
+    statHtml += '<div class="peer-stat"><span class="peer-label">你的精神压力</span><span class="peer-value" style="color:' + (myAvg > peerAvg ? 'var(--stamp-red)' : 'var(--green-ok)') + '">' + myAvg + '%</span></div>';
+    statHtml += '<div class="peer-stat"><span class="peer-label">你比同龄人</span><span class="peer-value" style="color:' + (myAvg > peerAvg ? 'var(--stamp-red)' : 'var(--green-ok)') + '">' + (myAvg > peerAvg ? '高' + (myAvg - peerAvg) + '%' : '低' + (peerAvg - myAvg) + '%') + '</span></div>';
+    statsEl.innerHTML = statHtml;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LANDSCAPE — p5.js 粒子景观
+   ═══════════════════════════════════════════════════════════════ */
+function launchLandscape() {
+  if (p5Instance) { p5Instance.remove(); p5Instance = null; }
+  var container = document.getElementById('landscapeContainer');
+  var avgScore = totalScore;
+  var isDark = document.body.classList.contains('dark');
+
+  var sketch = function (p) {
+    var particles = [];
+    var flowField = [];
+    var cols, rows;
+    var scl = 20;
+    var zoff = 0;
+    var particleCount = 300;
+
+    p.setup = function () {
+      var c = p.createCanvas(container.offsetWidth, container.offsetHeight || 220);
+      c.parent('landscapeContainer');
+      p.colorMode(p.HSB, 360, 100, 100, 100);
+      cols = p.floor(p.width / scl);
+      rows = p.floor(p.height / scl);
+      flowField = new Array(cols * rows);
+      for (var i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+      p.background(0, 0, 0, 0);
+    };
+
+    p.draw = function () {
+      // 根据得分动态调整背景和色调
+      var bgAlpha;
+      if (avgScore >= 70) {
+        bgAlpha = isDark ? 15 : 8;
+        p.background(0, 80, 20, bgAlpha);
+      } else if (avgScore >= 40) {
+        bgAlpha = isDark ? 12 : 6;
+        p.background(30, 60, 25, bgAlpha);
+      } else {
+        bgAlpha = isDark ? 10 : 5;
+        p.background(210, 30, 30, bgAlpha);
+      }
+
+      var yoff = 0;
+      for (var y = 0; y < rows; y++) {
+        var xoff = 0;
+        for (var x = 0; x < cols; x++) {
+          var index = x + y * cols;
+          var angle = p.noise(xoff, yoff, zoff) * p.TWO_PI * 2;
+          var v = p5.Vector.fromAngle(angle);
+          v.setMag(0.5 + p.noise(xoff, yoff, zoff) * 0.5);
+          flowField[index] = v;
+          xoff += 0.1;
+        }
+        yoff += 0.1;
+      }
+      zoff += 0.003;
+
+      for (var i = 0; i < particles.length; i++) {
+        particles[i].follow(flowField);
+        particles[i].update();
+        particles[i].edges();
+        particles[i].show(p);
+      }
+    };
+
+    function Particle() {
+      this.pos = p.createVector(p.random(p.width), p.random(p.height));
+      this.vel = p.createVector(0, 0);
+      this.acc = p.createVector(0, 0);
+      this.maxSpeed = 1.5 + p.random(1);
+
+      // 根据得分决定颜色范围
+      var hue;
+      if (avgScore >= 70) {
+        hue = p.random(0, 20); // 红色调：重症
+      } else if (avgScore >= 40) {
+        hue = p.random(25, 50); // 橙黄色调：亚健康
+      } else {
+        hue = p.random(190, 230); // 蓝色调：正常
+      }
+      this.hue = hue;
+      this.sat = 60 + p.random(40);
+      this.bri = 70 + p.random(30);
+      this.alpha = 40 + p.random(60);
+
+      this.follow = function (vectors) {
+        var x = p.floor(this.pos.x / scl);
+        var y = p.floor(this.pos.y / scl);
+        var index = x + y * cols;
+        if (index >= 0 && index < vectors.length) {
+          var force = vectors[index];
+          this.acc.add(force);
+        }
+      };
+
+      this.update = function () {
+        this.vel.add(this.acc);
+        this.vel.limit(this.maxSpeed);
+        this.pos.add(this.vel);
+        this.acc.mult(0);
+        this.alpha = p.max(15, this.alpha - 0.05);
+      };
+
+      this.edges = function () {
+        if (this.pos.x > p.width) { this.pos.x = 0; this.alpha = 80; }
+        if (this.pos.x < 0) { this.pos.x = p.width; this.alpha = 80; }
+        if (this.pos.y > p.height) { this.pos.y = 0; this.alpha = 80; }
+        if (this.pos.y < 0) { this.pos.y = p.height; this.alpha = 80; }
+      };
+
+      this.show = function () {
+        p.stroke(this.hue, this.sat, this.bri, this.alpha * 0.5);
+        p.strokeWeight(1 + p.random(1));
+        p.point(this.pos.x, this.pos.y);
+      };
+    }
+  };
+  p5Instance = new p5(sketch);
+
+  // 更新景观描述
+  if (avgScore >= 70) {
+    document.getElementById('landscapeTitle').textContent = '狂暴漩涡';
+    document.getElementById('landscapeDesc').textContent = '红色粒子流场，代表高度精神压力';
+  } else if (avgScore >= 40) {
+    document.getElementById('landscapeTitle').textContent = '波动流线';
+    document.getElementById('landscapeDesc').textContent = '橙黄色粒子流场，代表亚健康波动';
+  } else {
+    document.getElementById('landscapeTitle').textContent = '平缓平原';
+    document.getElementById('landscapeDesc').textContent = '蓝色粒子流场，代表精神平稳';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRESCRIPTION, SHARE, RESTART
+   ═══════════════════════════════════════════════════════════════ */
+function goToPrescription() {
+  showLoading(function () {
+    showScreen('scr-presc');
+    var rxItems = getPrescription(totalScore, userGroup === 'student', easterEggType);
+    document.getElementById('rxName').textContent = patientName;
+    document.getElementById('rxId').textContent = document.getElementById('rptId').textContent;
+    document.getElementById('rxDoctorName').textContent = currentDoctor.name;
+    document.getElementById('rxDoctorSig').textContent = currentDoctor.sig;
+    var now = new Date();
+    document.getElementById('rxDate').textContent = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+    var rxHtml = '';
+    rxItems.forEach(function (item) {
+      rxHtml += '<div class="rx-row">';
+      rxHtml += '<div class="rx-emoji">' + item.emoji + '</div>';
+      rxHtml += '<div class="rx-detail">';
+      rxHtml += '<div class="rx-name">' + item.name + '</div>';
+      rxHtml += '<div class="rx-dose">' + item.dose + '</div>';
+      rxHtml += '<div class="rx-note">' + item.note + '</div>';
+      rxHtml += '</div></div>';
+    });
+    document.getElementById('rxItems').innerHTML = rxHtml;
+
+    var reviewEl = document.getElementById('rxReview');
+    var reviewTextEl = document.getElementById('rxReviewText');
+    if (totalScore >= 70) {
+      reviewEl.style.display = 'block';
+      reviewTextEl.textContent = '建议1周后复查。如症状持续恶化，请立即前往最近的海底捞或奶茶店进行紧急治疗。';
+    } else if (totalScore >= 40) {
+      reviewEl.style.display = 'block';
+      reviewTextEl.textContent = '建议2周后复查。保持现有治疗方案，如有不适及时调整。';
+    } else {
+      reviewEl.style.display = 'none';
+    }
+  }, 400);
+}
+
+function showCardPage() {
+  document.getElementById('cardPersonaName').textContent = personaLabel;
+  document.getElementById('cardPersonaTagline').textContent = personaDesc;
+  document.getElementById('cardPersonaImg').src = 'img/' + personaLabel + '.png';
+  showScreen('scr-card');
+}
+
+function goBackFromCard() {
+  showScreen('scr-presc');
+}
+
+function restartCheckup() {
+  if (p5Instance) { p5Instance.remove(); p5Instance = null; }
+  userGroup = '';
+  userSubGroup = '';
+  currentStep = 1;
+  currentQ = 0;
+  answers = [];
+  totalScore = 0;
+  tagCounts = {};
+  personaLabel = '';
+  personaDesc = '';
+  patientName = '';
+  easterEggTriggered = false;
+  easterEggType = '';
+  achievement = '';
+  currentDoctor = null;
+  document.getElementById('patientName').value = '';
+  showScreen('scr-register');
+  document.getElementById('btnStep1').disabled = true;
+  document.querySelectorAll('.group-card').forEach(function (c) {
+    c.classList.remove('selected', 'selected-student', 'selected-worker');
+  });
+  document.querySelectorAll('.reg-step').forEach(function (s) { s.classList.remove('show'); });
+  document.getElementById('regStep1').classList.add('show');
+  ['progDot1', 'progDot2', 'progDot3'].forEach(function (d) { document.getElementById(d).className = 'prog-dot'; });
+  document.getElementById('progDot1').classList.add('active');
+  ['progLabel1', 'progLabel2', 'progLabel3'].forEach(function (l) { document.getElementById(l).className = 'prog-label'; });
+  document.getElementById('progLabel1').classList.add('active');
+  ['progLine1', 'progLine2'].forEach(function (l) { document.getElementById(l).className = 'prog-line'; });
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function () { toast.classList.remove('show'); }, 2000);
+}
+</script>
+</html>
