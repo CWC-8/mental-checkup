@@ -55,23 +55,25 @@ body.dark .share-card{background:var(--paper-warm);color:var(--ink);}
 body.dark .reg-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.06);}
 
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;margin:0;padding:0;}
+html{overflow:hidden;}
 body{
   font-family:var(--font-sans);background:#e8ecf0;
-  color:var(--ink);font-size:15px;line-height:1.7;overflow-x:hidden;
+  color:var(--ink);font-size:15px;line-height:1.7;overflow:hidden;
   -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;
   transition:background .4s,color .4s;
 }
 .app{
-  max-width:480px;margin:0 auto;min-height:100svh;position:relative;background:var(--paper);
+  max-width:480px;margin:0 auto;height:100svh;position:relative;background:var(--paper);
   box-shadow:0 0 0 1px rgba(10,37,64,.04),0 8px 40px rgba(10,37,64,.08);
-  transition:background .4s;
+  transition:background .4s;overflow:hidden;
 }
 .screen{
-  position:absolute;top:0;left:0;width:100%;min-height:100svh;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;overflow:hidden;transform:translateY(12px);
+  position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;overflow-y:auto;overflow-x:hidden;transform:translateY(12px);
   transition:opacity .45s var(--ease-out),transform .45s var(--ease-out);
 }
-.screen.active{opacity:1;pointer-events:auto;overflow-y:auto;transform:translateY(0);}
+.screen.active{opacity:1;pointer-events:auto;transform:translateY(0);}
 
 /* 暗色模式切换按钮 */
 .dark-toggle{
@@ -267,7 +269,7 @@ body{
 @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
 
 /* ═══════════ REPORT ═══════════ */
-.scr-report{background:var(--paper);overflow-y:auto;padding-bottom:16px;}
+.scr-report{background:var(--paper);padding-bottom:16px;}
 .landscape-container{position:relative;width:100%;height:220px;overflow:hidden;margin:0;}
 .landscape-container canvas{display:block;width:100%!important;height:100%!important;}
 .landscape-overlay{
@@ -278,7 +280,7 @@ body{
 .landscape-overlay .landscape-title{font-family:var(--font-serif);font-size:16px;font-weight:700;}
 .landscape-overlay .landscape-desc{font-size:10px;opacity:.45;margin-top:2px;line-height:1.4;}
 
-.report-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;position:relative;}
+.report-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);position:relative;}
 .rpt-header{
   background:linear-gradient(135deg,var(--brand-blue) 0%,var(--brand-deep) 100%);color:#fff;
   padding:22px 24px;text-align:center;position:relative;overflow:hidden;
@@ -452,8 +454,8 @@ body{
 
 
 /* ═══════════ PRESCRIPTION ═══════════ */
-.scr-presc{background:var(--paper);overflow-y:auto;padding-bottom:16px;}
-.presc-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);overflow:hidden;}
+.scr-presc{background:var(--paper);padding-bottom:16px;}
+.presc-doc{background:var(--paper);margin:16px;border:1px solid var(--divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);}
 .presc-body{padding:24px;}
 .rx-list{display:flex;flex-direction:column;gap:0;}
 .rx-row{display:flex;align-items:flex-start;gap:14px;padding:16px 12px;border-bottom:1px solid var(--divider-light);transition:all .25s var(--ease-out);border-radius:var(--radius-sm);}
@@ -488,7 +490,7 @@ body{
 
 /* ═══════════ SCREENSHOT CARD PAGE ═══════════ */
 .card-page{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:48px 28px;text-align:center;position:relative;overflow:hidden;
   background:var(--brand-sky);
 }
@@ -562,7 +564,10 @@ body.dark .card-footer .cf-brand{color:var(--brand-accent);}
   .group-grid{grid-template-columns:1fr 1fr;gap:8px;}.group-card .gc-emoji{font-size:28px;}
   .share-card .sc-score{font-size:44px;}
 }
-@media(min-width:481px){.app{border-radius:16px;margin-top:20px;margin-bottom:20px;}body{padding:12px 0;}}
+@media(min-width:481px){
+  .app{border-radius:16px;height:calc(100svh - 40px);margin:0 auto;}
+  body{padding:20px 0;overflow:hidden;}
+}
 </style>
 </head>
 <body>
@@ -1079,7 +1084,7 @@ var questionBanks = {};
 /* PRESCHOOL - 大学级难题×反差萌选项 */
 questionBanks['student_preschool'] = [
   { title: '高等微积分', text: '请计算定积分：<i>∫</i><sub>0</sub><sup>∞</sup> <i>e</i><sup>-<i>x</i>²</sup> <i>dx</i> = ？', options: [
-    { letter: 'A', text: '√π/2（高斯积分，拉普拉斯变换可证）', v: 8, tag: 'think' },
+    { letter: 'A', text: '√π/2（高斯积分，拉普拉斯变换可证）', v: 8, tag: 'storm' },
     { letter: 'B', text: '大概等于3.14，因为π约等于3.14，开根号再除以2...让我再算算', v: 2, tag: 'fish' },
     { letter: 'C', text: '这个符号我认识，叫"积分"，但后面的东西像猫踩键盘踩出来的', v: 3, tag: 'grind' },
     { letter: 'D', text: '我用计算器按了一下，显示"Syntax Error"', v: 4, tag: 'plant' }
@@ -1109,7 +1114,7 @@ questionBanks['student_preschool'] = [
     { letter: 'D', text: '我只会用苯来擦白板上的记号笔，不知道它还能合成别的东西', v: 2, tag: 'plant' }
   ]},
   { title: '量子力学', text: '解释海森堡不确定性原理：<i>Δx·Δp</i> ≥ <i>ℏ</i>/2', options: [
-    { letter: 'A', text: '粒子的位置和动量不可同时精确测量，两者不确定度乘积不小于约化普朗克常数的一半', v: 8, tag: 'think' },
+    { letter: 'A', text: '粒子的位置和动量不可同时精确测量，两者不确定度乘积不小于约化普朗克常数的一半', v: 8, tag: 'storm' },
     { letter: 'B', text: '说明我找不到手机的时候，手机也在找我——我们互相不确定对方的位置', v: 3, tag: 'fish' },
     { letter: 'C', text: '这解释了为什么你永远不知道猫在哪，也永远不知道它下一秒要跑多快', v: 3, tag: 'grind' },
     { letter: 'D', text: '海森堡开车超速被拦，交警问"开多快"，他说"不知道，但我知道我在哪"', v: 4, tag: 'plant' }
@@ -1122,71 +1127,82 @@ questionBanks['student_preschool'] = [
   ]},
   { title: '计算机科学', text: 'P vs NP问题为什么被列为千禧年七大数学难题之一？', options: [
     { letter: 'A', text: 'P类可多项式时间求解，NP类可多项式时间验证。P=NP? 将颠覆密码学、优化、AI等领域', v: 8, tag: 'think' },
-    { letter: 'B', text: 'P=容易，NP=不容易但验证容易。问题是"容易"和"验证容易"是不是一回事', v: 3, tag: 'fish' },
+    { letter: 'B', text: 'P=容易，NP=不容易但验证容易。问题是"容易"和"验证容易"是不是一回事', v: 3, tag: 'think' },
     { letter: 'C', text: '如果能证明P=NP，所有密码瞬间破解，微信支付和支付宝明天就倒闭', v: 4, tag: 'grind' },
     { letter: 'D', text: '我已经证明了P=NP，但这里空白太小写不下', v: 2, tag: 'buddha' }
   ]},
   { title: '语言学', text: '用乔姆斯基的生成语法理论分析"张三被李四打了"的深层结构', options: [
     { letter: 'A', text: 'D-structure为[<sub>IP</sub>[<sub>NP</sub>李四][<sub>VP</sub>[<sub>V\'</sub>打了][<sub>NP</sub>张三]]]，被动化移位使张三移至[Spec,IP]获得主格', v: 8, tag: 'think' },
     { letter: 'B', text: '深层结构就是"李四打了张三"，然后"张三"跑到前面加个"被"，变成"被李四打了"', v: 3, tag: 'fish' },
-    { letter: 'C', text: '乔姆斯基是语言学家，不是那个巧克力品牌——虽然名字很像，但巧克力不能分析语法', v: 3, tag: 'grind' },
+    { letter: 'C', text: '乔姆斯基是语言学家，不是那个巧克力品牌——虽然名字很像，但巧克力不能分析语法', v: 3, tag: 'fish' },
     { letter: 'D', text: '这个句子的深层结构是：张三真惨，被人打了还要被语言学家分析一遍', v: 4, tag: 'plant' }
   ]},
   { title: '金融数学', text: '推导布莱克-斯科尔斯期权定价模型的偏微分方程', options: [
     { letter: 'A', text: '基于无套利原理，Δ对冲+伊藤引理，得 ∂V/∂t + ½σ²S²∂²V/∂S² + rS∂V/∂S - rV = 0', v: 8, tag: 'think' },
     { letter: 'B', text: '核心思想：在理想世界里，期权可以通过不断买卖股票来完美复制——可惜世界不理想', v: 3, tag: 'fish' },
-    { letter: 'C', text: '布莱克和斯科尔斯因为这个公式拿了诺贝尔经济学奖——可惜布莱克去世了没领到', v: 4, tag: 'grind' },
+    { letter: 'C', text: '布莱克和斯科尔斯因为这个公式拿了诺贝尔经济学奖——但颁奖那天布莱克去钓鱼了没空来', v: 4, tag: 'grind' },
     { letter: 'D', text: '这个公式在《繁花》里出现过，宝总用它算股票，算对了但还是差点破产', v: 2, tag: 'buddha' }
+  ]},
+  { title: '神经网络', text: 'AI科学家说把足够多的神经元连在一起就能产生智能，你觉得？', options: [
+    { letter: 'A', text: '我脑子里确实有很多神经，但大部分都在想"为什么奥特曼不用写作业而我要写"', v: 8, tag: 'ai' },
+    { letter: 'B', text: '我用神经网络预测了妈妈今天会不会生气——准确率100%，但预测完她更生气了', v: 6, tag: 'storm' },
+    { letter: 'C', text: '神经网络？我连自己的神经都控制不了，还想控制网络的？', v: 4, tag: 'plant' },
+    { letter: 'D', text: '这个问题太简单了，我三岁就会了——等等，我现在就是三岁', v: 2, tag: 'buddha' }
+  ]},
+  { title: '社交心理学', text: '老师说"人类是社交动物"，让你去和隔壁班的小朋友交朋友，你？', options: [
+    { letter: 'A', text: '躲进被子里，宣称"我的社交圈只有三个人：我、妈妈、和iPad里的汪汪队"', v: 8, tag: 'fox' },
+    { letter: 'B', text: '认真思考了"社交"的定义，决定先用积木搭一个社交模型模拟一下', v: 6, tag: 'think' },
+    { letter: 'C', text: '走过去，但只说了"你好"，然后转身跑了——社交任务完成，打卡下班', v: 4, tag: 'fish' },
+    { letter: 'D', text: '大方地走过去，从口袋里掏出一颗糖："给你，我们就是朋友了。"效率极高', v: 2, tag: 'grind' }
   ]}
 ];
-
 /* K9 — 校园荒诞主义 */
 questionBanks['student_k9'] = [
-  { title: '已读乱回', text: '同桌给你发了一长段小作文，你的回复是？', options: [
-    { letter: 'A', text: '秒回"哈哈哈哈哈哈"，然后发现她说的是她家猫去世了，撤回已来不及', v: 8, tag: 'storm' },
+  { title: '已读乱答', text: '同桌给你发了一长段小作文，你的回复是？', options: [
+    { letter: 'A', text: '秒回"哈哈哈哈哈哈"，然后发现她说的是她家猫把沙发抓烂了，撤回已来不及', v: 8, tag: 'storm' },
     { letter: 'B', text: '认真分析每句话，写了300字回复，发出去发现已被拉黑', v: 6, tag: 'think' },
-    { letter: 'C', text: '已读，但没回——打游戏打到忘记手机还有聊天功能', v: 3, tag: 'fish' },
+    { letter: 'C', text: '已读，但没回——打游戏打到忘记手机还有聊天功能', v: 3, tag: 'plant' },
     { letter: 'D', text: '回了个黄豆微笑表情，然后关机睡觉，第二天说"昨晚手机没电了"', v: 1, tag: 'buddha' }
   ]},
   { title: '课堂尴尬', text: '老师点名让你回答问题，你完全没听课，站起来后——', options: [
-    { letter: 'A', text: '大脑一片空白，和老师对视了整整十秒，全班安静得能听见心跳', v: 9, tag: 'storm' },
+    { letter: 'A', text: '大脑一片空白，和老师对视了整整十秒，全班安静得能听见心跳', v: 9, tag: 'fox' },
     { letter: 'B', text: '开始胡编乱造，硬是把一道数学题回答成了历史课的内容，老师说"你坐下吧"', v: 6, tag: 'think' },
     { letter: 'C', text: '小声说"老师我没听懂"，然后同桌疯狂给你递答案，但字太潦草你看不清', v: 4, tag: 'fish' },
     { letter: 'D', text: '坦然承认"我没听课"，老师愣了一下反而笑了，说"诚实加分"', v: 2, tag: 'buddha' }
   ]},
   { title: 'AI判官', text: '你用DeepSeek帮你写作文，结果老师用AI检测查出来了，你？', options: [
     { letter: 'A', text: '在办公室哭得梨花带雨，说"AI害我"，老师差点信了', v: 8, tag: 'storm' },
-    { letter: 'B', text: '连夜研究反AI检测技术，决定和老师进入军备竞赛', v: 7, tag: 'think' },
+    { letter: 'B', text: '连夜研究反AI检测技术，决定和老师进入军备竞赛', v: 7, tag: 'ai' },
     { letter: 'C', text: '狡辩说这是"人机协作"不是"抄袭"，老师愣了五秒', v: 4, tag: 'fish' },
     { letter: 'D', text: '让AI帮你写了一份检讨书，然后又用AI查重查了一遍，完美闭环', v: 2, tag: 'buddha' }
   ]},
-  { title: '偷感', text: '在教室偷偷吃辣条，被班主任从后门盯了三十秒，你？', options: [
+  { title: '偷感症', text: '在教室偷偷吃辣条，被班主任从后门盯了三十秒，你？', options: [
     { letter: 'A', text: '辣条直接呛进气管，咳嗽三分钟，全班围观，班主任也没绷住笑出声', v: 8, tag: 'storm' },
     { letter: 'B', text: '把辣条包装纸揉成团塞进袖子里，假装自己一直在思考数学题', v: 6, tag: 'think' },
-    { letter: 'C', text: '和老师对视三秒，缓缓把辣条递过去："老师，您也来一根？"', v: 3, tag: 'fish' },
+    { letter: 'C', text: '和老师对视三秒，缓缓把辣条递过去："老师，您也来一根？"', v: 3, tag: 'plant' },
     { letter: 'D', text: '完全没发现老师，吃完才发现全班都在憋笑，老师已经走了', v: 1, tag: 'buddha' }
   ]},
-  { title: '硬控', text: '说好只看五分钟短视频，回过神已经过去两小时，你？', options: [
+  { title: '硬控场', text: '说好只看五分钟短视频，回过神已经过去两小时，你？', options: [
     { letter: 'A', text: '陷入深深自责，制定"明日戒手机计划"——已经是第38次了', v: 8, tag: 'storm' },
     { letter: 'B', text: '开始认真计算：每天浪费两小时，一年就是730小时，然后更焦虑了', v: 6, tag: 'think' },
     { letter: 'C', text: '算了，反正作业也写不完，再刷一会，破罐破摔是门艺术', v: 4, tag: 'fish' },
     { letter: 'D', text: '"人活着不就是为了快乐吗？"——然后继续刷，毫无心理负担', v: 1, tag: 'buddha' }
   ]},
   { title: 'i人地狱', text: '老师让你在全班面前即兴演讲，你站在讲台上，第一句话是？', options: [
-    { letter: 'A', text: '声音颤抖地说"大...大家好"，然后大脑一片空白，安静了整整三十秒', v: 9, tag: 'storm' },
+    { letter: 'A', text: '声音颤抖地说"大...大家好"，然后大脑一片空白，安静了整整三十秒', v: 9, tag: 'fox' },
     { letter: 'B', text: '提前准备了逐字稿，但念到一半发现稿子拿反了，硬着头皮倒着念', v: 7, tag: 'think' },
     { letter: 'C', text: '直接开始freestyle，讲了十分钟，但没人知道主题是什么，老师说"你先下去"', v: 4, tag: 'fish' },
     { letter: 'D', text: '"我放弃了，有没有人想上来替我讲？"——结果真的有人举手了', v: 2, tag: 'buddha' }
   ]},
-  { title: '松弛感', text: '明天期中考试，今晚你？', options: [
+  { title: '松弛学', text: '明天期中考试，今晚你？', options: [
     { letter: 'A', text: '在书桌前坐了四小时，但有效学习时间不到20分钟，剩下的时间都在焦虑', v: 8, tag: 'storm' },
     { letter: 'B', text: '整理了一小时文具，又整理了一小时书桌，就是不开始复习', v: 7, tag: 'think' },
     { letter: 'C', text: '把所有课本压在枕头下，坚信渗透压能传输知识，然后安心睡觉', v: 3, tag: 'fish' },
-    { letter: 'D', text: '九点就睡了，坚信"状态好大于临时抱佛脚"，第二天精神饱满地考砸了', v: 1, tag: 'buddha' }
+    { letter: 'D', text: '九点就睡了，坚信"状态好大于临时抱佛脚"，第二天精神饱满地考砸了', v: 1, tag: 'grind' }
   ]},
   { title: '抽象作业', text: '老师布置了"用诗歌形式写数学作业"，你的反应？', options: [
     { letter: 'A', text: '真的认真写了，交上去后老师在全班朗读，你当场社死', v: 8, tag: 'storm' },
-    { letter: 'B', text: '用AI生成了一首，但AI把"三角形"写成了"三明治"，你交上去才发现', v: 6, tag: 'think' },
+    { letter: 'B', text: '用AI生成了一首，但AI把"三角形"写成了"三文鱼"，你交上去才发现', v: 6, tag: 'ai' },
     { letter: 'C', text: '在作业本上画了一个抽象派涂鸦，题目标注"现代诗"，老师给了个"？"', v: 3, tag: 'fish' },
     { letter: 'D', text: '直接不交，并在备注写"抽象作业配抽象学生，我请假"，老师笑了', v: 2, tag: 'buddha' }
   ]},
@@ -1196,20 +1212,31 @@ questionBanks['student_k9'] = [
     { letter: 'C', text: '还在回味周末打游戏的高光时刻，上课时突然笑出声，被老师点名', v: 3, tag: 'fish' },
     { letter: 'D', text: '精神抖擞，已经预习了下周的内容，全班第一个到——然后趴下补觉', v: 1, tag: 'buddha' }
   ]},
-  { title: '命运的齿轮', text: '刷到短视频说"命运的齿轮开始转动"，你觉得你的齿轮？', options: [
+  { title: '命运的齿轮·童年版', text: '刷到短视频说"命运的齿轮开始转动"，你觉得你的齿轮？', options: [
     { letter: 'A', text: '已经卡死了，而且好像还掉了几个齿，急需DeepSeek来帮我修一修', v: 9, tag: 'storm' },
     { letter: 'B', text: '在转，但方向好像反了，离目标越来越远，是不是该倒着走？', v: 7, tag: 'think' },
     { letter: 'C', text: '什么齿轮？我的人生是一辆没有方向盘的碰碰车，撞到哪算哪', v: 4, tag: 'fish' },
-    { letter: 'D', text: '齿轮生锈了，但我用松弛感当润滑油，转得慢但至少不卡', v: 2, tag: 'buddha' }
+    { letter: 'D', text: '齿轮生锈了，但我用松弛感当润滑油，转得慢但至少不卡', v: 2, tag: 'grind' }
+  ]},
+  { title: 'AI同桌', text: '老师说以后每个同学都会配一个AI学习助手，你？', options: [
+    { letter: 'A', text: '开始焦虑——AI会不会发现我上课其实在桌子底下折纸飞机？', v: 8, tag: 'ai' },
+    { letter: 'B', text: '兴奋地问AI能不能帮我写作业，AI说"可以，但老师会发现的"——我陷入了沉思', v: 6, tag: 'storm' },
+    { letter: 'C', text: '算了，AI再厉害也不能帮我罚站、帮我跑步、帮我应付我妈的唠叨', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '已经开始研究怎么让AI帮我作弊了——然后发现AI的道德模块比老师还严格', v: 4, tag: 'grind' }
+  ]},
+  { title: '才艺黑洞', text: '学校要举办才艺展示，老师说"每个人都要报名"，你环顾四周发现——', options: [
+    { letter: 'A', text: '同学们会唱歌、跳舞、弹钢琴、变魔术——而我只会用舌头舔到鼻子', v: 8, tag: 'fox' },
+    { letter: 'B', text: '连夜学了三个魔术，但表演时全穿帮了，全班笑成一团——反而拿了最佳人气奖', v: 6, tag: 'storm' },
+    { letter: 'C', text: '报名了"朗诵"，上台后念了三十秒，然后说"我忘词了"，鞠躬下台——全场掌声', v: 4, tag: 'fish' },
+    { letter: 'D', text: '不报名，但被老师强行安排当了主持人——结果主持得比表演还精彩', v: 2, tag: 'grind' }
   ]}
 ];
-
 /* HIGH SCHOOL — 荒诞青春 */
 questionBanks['student_highschool'] = [
   { title: '手机防窥膜', text: '你妈突然说"把你手机给我看看"，你的反应？', options: [
     { letter: 'A', text: '手抖着递过去，心跳180，开始回忆最近浏览记录——完了，昨天搜了"如何藏手机"', v: 9, tag: 'storm' },
     { letter: 'B', text: '镇定地说"手机没电了"，然后发现屏幕是亮的，当场社死', v: 6, tag: 'think' },
-    { letter: 'C', text: '立刻把手机扔进书包，说"我忘了放哪了"，然后手机在书包里响了', v: 4, tag: 'fish' },
+    { letter: 'C', text: '立刻把手机扔进书包，说"我忘了放哪了"，然后手机在书包里响了', v: 4, tag: 'grind' },
     { letter: 'D', text: '坦然地递过去——因为所有聊天记录都设了阅后即焚，防窥膜都省了', v: 2, tag: 'buddha' }
   ]},
   { title: '深夜大脑', text: '凌晨一点，你躺在床上，大脑在播放什么？', options: [
@@ -1220,19 +1247,19 @@ questionBanks['student_highschool'] = [
   ]},
   { title: 'AI写作业', text: '你用AI写完了作业，结果老师在班上朗读了你的"优秀作业"，你？', options: [
     { letter: 'A', text: '脸涨得通红，祈祷没人发现那些"综上所述"是AI的口头禅', v: 8, tag: 'storm' },
-    { letter: 'B', text: '暗自得意——AI写的就是好，下次还用它，进入人机协作新纪元', v: 3, tag: 'fish' },
+    { letter: 'B', text: '暗自得意——AI写的就是好，下次还用它，进入人机协作新纪元', v: 3, tag: 'grind' },
     { letter: 'C', text: '开始研究反AI检测技术，决定和老师进入军备竞赛', v: 6, tag: 'grind' },
     { letter: 'D', text: '老师念完后说"不过有些地方太像AI写的了"，全班看向你，你假装看窗外', v: 9, tag: 'ai' }
   ]},
   { title: '高考倒计时', text: '距离高考还有100天，你的精神状态？', options: [
     { letter: 'A', text: '每天刷题到凌晨，黑眼圈可以当烟熏妆，但成绩还在原地踏步', v: 9, tag: 'storm' },
-    { letter: 'B', text: '制定了详细的百日冲刺计划，已经执行了三天——然后第四天睡过头了', v: 7, tag: 'think' },
+    { letter: 'B', text: '制定了详细的百日冲刺计划，已经执行了三天——然后第四天睡过头了', v: 7, tag: 'fish' },
     { letter: 'C', text: '100天？还早呢，我先看个视频放松一下——然后一周过去了', v: 4, tag: 'fish' },
-    { letter: 'D', text: '已经保送了，在教室后排吃瓜看同学们卷，偶尔帮忙递个纸巾', v: 1, tag: 'buddha' }
+    { letter: 'D', text: '已经保送了，在教室后排吃瓜看同学们卷，偶尔帮忙递个纸巾', v: 1, tag: 'plant' }
   ]},
   { title: '破防瞬间', text: '你最近一次"破防"是因为什么？', options: [
     { letter: 'A', text: '辛辛苦苦写了一周的作业，老师说"这个不用交"——当场破防', v: 8, tag: 'storm' },
-    { letter: 'B', text: '看到别人的成绩单，再看了看自己的，默默关掉了手机——成年人最后的体面', v: 7, tag: 'think' },
+    { letter: 'B', text: '看到别人的成绩单，再看了看自己的，默默关掉了手机——未成年人最后的体面', v: 7, tag: 'think' },
     { letter: 'C', text: '外卖被偷了，在宿舍楼下无能狂怒，室友说"算了再点一份"，更气了', v: 5, tag: 'storm' },
     { letter: 'D', text: '我从不破防——佛系人生，破防是不可能的，最多就是内心默默流泪', v: 2, tag: 'buddha' }
   ]},
@@ -1242,38 +1269,49 @@ questionBanks['student_highschool'] = [
     { letter: 'C', text: '微笑着说"挺好的，年级前十"，然后接受全场赞美——虽然真实排名是倒数', v: 5, tag: 'fish' },
     { letter: 'D', text: '大方回答"不太好，但我心态好"，亲戚们反而不知道说什么了', v: 2, tag: 'buddha' }
   ]},
-  { title: '电子榨菜', text: '你吃饭时必配的"电子榨菜"是什么？', options: [
+  { title: '电子榨菜2.0', text: '你吃饭时必配的"电子榨菜"是什么？', options: [
     { letter: 'A', text: '学习视频——吃饭也在卷，榨菜是知识，米饭是焦虑', v: 8, tag: 'grind' },
     { letter: 'B', text: '各种搞笑短视频，一顿饭吃了两小时，因为一直在刷下一个', v: 4, tag: 'fish' },
-    { letter: 'C', text: '没有固定的——今天看美食视频，明天看游戏解说，后天看别人吃饭', v: 3, tag: 'buddha' },
+    { letter: 'C', text: '没有固定的——今天看美食视频，明天看游戏解说，后天看别人吃饭', v: 3, tag: 'plant' },
     { letter: 'D', text: '不配榨菜——专心吃饭，但吃完了发现自己根本不记得吃了什么', v: 6, tag: 'plant' }
   ]},
   { title: '纯路人', text: '班里八卦传到了你耳朵里，你的反应？', options: [
-    { letter: 'A', text: '竖起耳朵听完，然后假装什么都没听到——但内心已经在疯狂分析', v: 6, tag: 'think' },
+    { letter: 'A', text: '竖起耳朵听完，然后假装什么都没听到——但内心已经在疯狂分析', v: 6, tag: 'fox' },
     { letter: 'B', text: '纯路人，不关心，我只关心今天作业交不交——但其实你也是当事人之一', v: 4, tag: 'buddha' },
     { letter: 'C', text: '立刻加入讨论，提供了更多细节——然后发现八卦的主角就是你', v: 8, tag: 'storm' },
     { letter: 'D', text: '听完后默默打开手机，把八卦发给了另一个群——信息的搬运工', v: 3, tag: 'fish' }
   ]},
-  { title: '示弱文化', text: '同学说"我这次考得好差"，结果成绩出来年级前三，你？', options: [
+  { title: '示弱学', text: '同学说"我这次考得好差"，结果成绩出来年级前三，你？', options: [
     { letter: 'A', text: '内心：又被演了！表面：哇你好厉害！——成年人第一课：学会假笑', v: 8, tag: 'storm' },
     { letter: 'B', text: '开始反思自己是不是太老实了，决定下次考试前也说"我没复习"', v: 6, tag: 'think' },
     { letter: 'C', text: '早就习惯了，我已经免疫了', v: 3, tag: 'buddha' },
     { letter: 'D', text: '自己也说"我考得好差"，然后拿了年级第一，完成了从受害者到施害者的蜕变', v: 5, tag: 'grind' }
   ]},
-  { title: '爱你老己', text: '网络流行语"爱你老己"——你学会爱自己了吗？', options: [
+  { title: '爱你老己·校园版', text: '网络流行语"爱你老己"——你学会爱自己了吗？', options: [
     { letter: 'A', text: '爱自己？我连自己是谁都不知道，先找到自己再说吧', v: 8, tag: 'storm' },
     { letter: 'B', text: '在努力了——今天给自己买了奶茶，虽然是为了熬夜写作业，但至少奶茶是爱', v: 5, tag: 'fish' },
     { letter: 'C', text: '当然爱自己——每天照镜子都说"你真棒"，然后继续摆烂，爱不等于努力', v: 2, tag: 'buddha' },
     { letter: 'D', text: '爱你老己？我连老己是谁都不知道，这词火得莫名其妙', v: 4, tag: 'think' }
+  ]},
+  { title: 'AI监考', text: '学校宣布下学期所有考试启用AI监考系统，你的反应？', options: [
+    { letter: 'A', text: '开始研究AI监考的盲区——发现AI连我眨眼频率都能分析，策略：放弃挣扎', v: 8, tag: 'ai' },
+    { letter: 'B', text: '和同学讨论怎么对抗AI——"AI看的不是你的小抄，是你心虚的眼神"', v: 6, tag: 'storm' },
+    { letter: 'C', text: '不慌，反正我从来没想过作弊——主要是没那个胆子，不是不想', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '已经在训练一个"反AI监考AI"，进入军备竞赛——老师说我走火入魔了', v: 5, tag: 'grind' }
+  ]},
+  { title: '朋友圈考古', text: '深夜失眠，你开始翻自己三年前的朋友圈，发现——', options: [
+    { letter: 'A', text: '三年前的自己居然发过"今晚月色真美"，底下还有人评论——现在想想当场社死', v: 8, tag: 'fox' },
+    { letter: 'B', text: '翻到凌晨三点，把每一条都删了——删完又后悔，开始回忆删了什么', v: 6, tag: 'storm' },
+    { letter: 'C', text: '翻着翻着睡着了，手机砸脸上——第二天醒来发现点赞了一个三年前的动态', v: 4, tag: 'plant' },
+    { letter: 'D', text: '发现三年前的自己比现在有趣多了——开始怀疑自己是不是退化成了NPC', v: 5, tag: 'think' }
   ]}
 ];
-
 /* COLLEGE — 躺平荒诞派 */
 questionBanks['student_college'] = [
   { title: '论文美学', text: '你的毕业论文进度条现在长什么样？', options: [
     { letter: 'A', text: '只写了标题，但已经改了十八遍——"论当代大学生精神内耗"改成"浅谈"再改成"基于"', v: 9, tag: 'storm' },
     { letter: 'B', text: '写了三万字，查重率0.3%——但导师说"你这个选题方向完全错了"', v: 8, tag: 'think' },
-    { letter: 'C', text: 'deadline是明天，现在是凌晨两点，我正在用AI生成——然后手动加错别字降重', v: 6, tag: 'fish' },
+    { letter: 'C', text: 'deadline是明天，现在是凌晨两点，我正在用AI生成——然后手动加错别字降重', v: 6, tag: 'plant' },
     { letter: 'D', text: '什么论文？不是下学期的事吗？——已读乱回，人在床上，灵魂在梦里', v: 3, tag: 'buddha' }
   ]},
   { title: '宿舍关系', text: '你室友的雷人行为，最让你崩溃的是？', options: [
@@ -1283,10 +1321,10 @@ questionBanks['student_college'] = [
     { letter: 'D', text: '搬出去住了——宿舍关系？不存在的，我和外卖小哥的关系都比室友亲', v: 5, tag: 'fox' }
   ]},
   { title: '生活费博弈', text: '月底了，你的银行卡余额是多少？', options: [
-    { letter: 'A', text: '精确到小数点后两位——3.14元，刚好够买一个包子，但包子已经涨价到3.5了', v: 8, tag: 'storm' },
-    { letter: 'B', text: '不多了，但够用——因为我发明了"泡面+电子榨菜"的极致省钱套餐', v: 5, tag: 'fish' },
+    { letter: 'A', text: '精确到小数点后两位——3.14元，刚好够买一个包子，但自动扣费给我扣完了', v: 8, tag: 'storm' },
+    { letter: 'B', text: '不多了，但够用——因为我发明了"泡面+电子榨菜"的极致省钱套餐', v: 5, tag: 'plant' },
     { letter: 'C', text: '准备给爸妈发"最近过得怎么样"，然后等他们主动问"钱够不够花"', v: 6, tag: 'think' },
-    { letter: 'D', text: '余额充足——因为我兼职了，自己赚钱自己花，虽然赚的不多，但花得很开心', v: 2, tag: 'buddha' }
+    { letter: 'D', text: '余额充足——因为我兼职了，自己赚钱自己花，虽然赚的不多，但花得很开心', v: 2, tag: 'buddha' },
   ]},
   { title: 'AI抢饭碗', text: '看到AI能取代你专业80%的岗位，你？', options: [
     { letter: 'A', text: '连夜学习AI技能，打不过就加入——开始用AI写代码、画图、做PPT，卷死AI', v: 8, tag: 'ai' },
@@ -1294,7 +1332,7 @@ questionBanks['student_college'] = [
     { letter: 'C', text: 'AI再厉害也得有人吃饭——我决定去开餐厅，或者去养龙虾，或者去送外卖', v: 4, tag: 'fish' },
     { letter: 'D', text: '无所谓——AI不会帮我写论文（等等，它好像真的会），那没事了', v: 3, tag: 'buddha' }
   ]},
-  { title: '社交电量', text: '周末同学约你出门，你的第一反应？', options: [
+  { title: '社交电量', text: '周末不熟的同学约你出门，你的第一反应？', options: [
     { letter: 'A', text: '秒回"几点哪里见"——社交达人，但这种人全国不超过5%，你是其中之一吗', v: 1, tag: 'buddha' },
     { letter: 'B', text: '纠结二十分钟，回复"下次一定"——然后如释重负，继续躺平', v: 7, tag: 'fox' },
     { letter: 'C', text: '答应了，出门前五分钟后悔了——但不好意思鸽，硬着头皮出门了', v: 8, tag: 'fox' },
@@ -1302,33 +1340,45 @@ questionBanks['student_college'] = [
   ]},
   { title: '小组作业', text: '小组作业里，你通常是什么角色？', options: [
     { letter: 'A', text: '那个做所有事的人——因为其他人都不做，你怕挂科所以扛下了所有', v: 9, tag: 'storm' },
-    { letter: 'B', text: '那个只负责"整合"的人——把大家的东西拼在一起，然后发现每个人写的格式都不一样', v: 6, tag: 'think' },
+    { letter: 'B', text: '那个只负责"整合"的人——把大家的东西拼在一起，然后发现每个人写的格式都不一样', v: 6, tag: 'grind' },
     { letter: 'C', text: '那个消失的人——从头到尾没出现，最后一天在群里发了个"辛苦了各位"', v: 3, tag: 'fish' },
     { letter: 'D', text: '那个提意见的人——"我觉得这个方向不对""我觉得PPT不够好看"，但什么都没做', v: 4, tag: 'grind' }
   ]},
   { title: '简历焦虑', text: '写简历时，你发现自己大学四年最大的成就是？', options: [
     { letter: 'A', text: '绩点3.9，学生会主席，三段实习，简历像印刷品一样漂亮', v: 2, tag: 'grind' },
     { letter: 'B', text: '把"帮室友拿快递"写成了"物流管理经验"，把"点外卖"写成"供应链协调"', v: 6, tag: 'fish' },
-    { letter: 'C', text: '简历一片空白——开始怀疑自己这四年是不是在地球online里挂机了', v: 9, tag: 'storm' },
+    { letter: 'C', text: '简历一片空白——开始怀疑自己这四年是不是在地球online里挂机了', v: 9, tag: 'buddha' },
     { letter: 'D', text: '人生最大的成就是活着——心态稳如老狗，简历虽然空，但心率正常', v: 3, tag: 'buddha' }
   ]},
   { title: '考研考公', text: '身边的人都在考研考公，你？', options: [
     { letter: 'A', text: '也在准备——但每天晚上都在想"我为什么要考这个"，然后第二天继续刷题', v: 8, tag: 'storm' },
     { letter: 'B', text: '在考研和考公之间反复横跳——今天觉得考研有前途，明天觉得考公更稳定', v: 7, tag: 'think' },
     { letter: 'C', text: '不考——我要去创业，虽然不知道创什么，但先创了再说', v: 4, tag: 'fish' },
-    { letter: 'D', text: '已经想好了退路——回老家种地，养龙虾，开民宿，反正不卷了', v: 2, tag: 'buddha' }
+    { letter: 'D', text: '已经想好了退路——回老家种地，养土拨鼠，开民宿，反正不卷了', v: 2, tag: 'buddha' }
   ]},
-  { title: '毕业关卡', text: '如果毕业是地球online的一个关卡，你？', options: [
+  { title: '毕业关卡', text: '如果毕业是人生模拟器的一个关卡，你？', options: [
     { letter: 'A', text: '已经通关——工作/考研都安排好了，正在加载下一关', v: 1, tag: 'grind' },
     { letter: 'B', text: '还在打BOSS——考研分数出来了，在复试线附近，每天刷新网页八百次', v: 8, tag: 'storm' },
     { letter: 'C', text: '找不到出口——不知道自己要干什么，地图一片迷雾，连BOSS在哪都不知道', v: 9, tag: 'think' },
     { letter: 'D', text: '不想通关——想续费四年，永远留在大学这个安全区，外面的世界太可怕了', v: 5, tag: 'fish' }
   ]},
-  { title: '上头', text: '最近有什么东西让你"上头"到停不下来？', options: [
+  { title: '上头时刻', text: '最近有什么东西让你"上头"到停不下来？', options: [
     { letter: 'A', text: '焦虑上头了——每天焦虑，但焦虑又让我更焦虑，无限循环中', v: 9, tag: 'storm' },
     { letter: 'B', text: '短视频上头了——说好看五分钟，回过神来两小时过去了，算法比我还懂我', v: 5, tag: 'fish' },
     { letter: 'C', text: '被卷王室友带跑偏了——他每天学12小时，我跟着学着学着，已经不认识自己了', v: 7, tag: 'grind' },
     { letter: 'D', text: '躺平上头了——床是我的本体，我已经和床融为一体，分不开了', v: 3, tag: 'plant' }
+  ]},
+  { title: 'AI简历', text: '你发现室友用AI生成了一份简历，面试通过了，而你手写了一个月还没写完，你？', options: [
+    { letter: 'A', text: '开始焦虑——AI连简历都能写，我连简历都不会写，我是不是连AI都不如？', v: 8, tag: 'ai' },
+    { letter: 'B', text: '连夜下载了三个AI简历工具，但每个生成的简历都不一样——不知道该信哪个', v: 6, tag: 'storm' },
+    { letter: 'C', text: '算了，AI写的简历又不是AI去面试——面试官问"你会什么"的时候AI可帮不了', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '让AI写了一份简历，然后让另一个AI帮我改，再让第三个AI帮我润色——现在简历上有三个AI的名字', v: 4, tag: 'fish' }
+  ]},
+  { title: '群聊潜水', text: '班级群里有人在讨论周末聚餐，你被@了，你？', options: [
+    { letter: 'A', text: '假装没看到，关掉手机，然后偷偷用电脑看群聊——确保没人发现你在线', v: 8, tag: 'fox' },
+    { letter: 'B', text: '纠结了二十分钟，回复"我看看有没有时间"——然后开始祈祷有人取消', v: 6, tag: 'storm' },
+    { letter: 'C', text: '秒回"好的"，然后出门前五分钟开始后悔——但已经答应了，硬着头皮去', v: 4, tag: 'fish' },
+    { letter: 'D', text: '在群里发了个表情包，既不确认也不拒绝——主打一个模棱两可，量子态', v: 3, tag: 'buddha' }
   ]}
 ];
 
@@ -1341,13 +1391,13 @@ questionBanks['worker_junior'] = [
     { letter: 'D', text: '直接关机。明天的事明天再说，大不了被开除，反正本来就想辞职', v: 6, tag: 'plant' }
   ]},
   { title: '班味', text: '同事说你身上有"班味"，你是什么反应？', options: [
-    { letter: 'A', text: '照镜子惊恐地发现：黑眼圈、驼背、眼神空洞。这不叫班味，这叫工伤', v: 8, tag: 'storm' },
+    { letter: 'A', text: '照镜子惊恐地发现：黑眼圈、驼背、眼神空洞。这不叫班味，这叫工伤', v: 9, tag: 'storm' },
     { letter: 'B', text: '不以为耻反以为荣。"班味是我的勋章，说明我比你们卷"', v: 9, tag: 'grind' },
     { letter: 'C', text: '决定明天喷香水盖住班味，但不知道香水和班味混在一起更难闻', v: 5, tag: 'think' },
     { letter: 'D', text: '反问"什么是班味？"你已经闻不到了，说明班味已经入骨', v: 4, tag: 'fish' }
   ]},
-  { title: '牛马觉醒', text: '某个深夜加班，你突然意识到"牛马竟是我自己"，你的下一步？', options: [
-    { letter: 'A', text: '打开招聘软件开始投简历，万一有更好的呢？投了三个月，石沉大海', v: 7, tag: 'storm' },
+  { title: '牛马觉醒·初级', text: '某个深夜加班，你突然意识到"牛马竟是我自己"，你的下一步？', options: [
+    { letter: 'A', text: '打开招聘软件开始投简历，万一有更好的呢？投了三个月，石沉大海', v: 7, tag: 'grind' },
     { letter: 'B', text: '打开外卖软件点杯奶茶安慰自己。牛马也要喝奶茶，这是基本牛权', v: 3, tag: 'fish' },
     { letter: 'C', text: '冷静分析，列了一个"辞职倒计时"Excel。目前进度：0.3%', v: 6, tag: 'think' },
     { letter: 'D', text: '认命了，继续加班。牛马就牛马，至少是高级牛马，有社保的那种', v: 5, tag: 'buddha' }
@@ -1356,19 +1406,19 @@ questionBanks['worker_junior'] = [
     { letter: 'A', text: '已经被控到麻木了。睁眼第一件事看数据，做梦都在做报表，KPI已经刻进了DNA', v: 9, tag: 'storm' },
     { letter: 'B', text: '学会了反向硬控。把KPI做成了Excel艺术品，领导看了都说好，但实际没完成', v: 5, tag: 'fish' },
     { letter: 'C', text: '主动申请更多KPI。我卷我自己，让领导无KPI可加，卷到极致就是艺术', v: 8, tag: 'grind' },
-    { letter: 'D', text: '放弃抵抗。KPI是什么？我只知道下班时间到了，到点就走', v: 3, tag: 'buddha' }
+    { letter: 'D', text: '放弃抵抗。KPI是什么？我只知道下班时间到了，到点就走', v: 3, tag: 'buddha' },
   ]},
   { title: '偷感', text: '在工位上摸鱼，感觉背后有目光，你的反应？', options: [
-    { letter: 'A', text: '瞬间Alt+Tab切换到Excel，假装在分析数据。手指比大脑快，这是肌肉记忆', v: 3, tag: 'fish' },
+    { letter: 'A', text: '瞬间Alt+Tab切换到Excel，假装在分析数据。手指比大脑快，这是肌肉记忆', v: 3, tag: 'fox' },
     { letter: 'B', text: '不慌，继续刷微博。我摸鱼我骄傲，大不了被说两句，脸皮厚才是真本事', v: 5, tag: 'buddha' },
     { letter: 'C', text: '提前准备了3个假表格，切换时还有不同配色。专业摸鱼二十年，教科书级别', v: 4, tag: 'fish' },
     { letter: 'D', text: '已经被抓到过，现在采取"带薪拉屎"策略。物理隔绝监控，无懈可击', v: 6, tag: 'fox' }
   ]},
-  { title: '显眼包', text: '开会时领导问"大家有什么想法？"，你突然成了显眼包——', options: [
+  { title: '显眼包·初级', text: '开会时领导问"大家有什么想法？"，你突然成了显眼包——', options: [
     { letter: 'A', text: '你举手了，说了一堆自己都听不懂的话。但领导点头了，全场沉默，你成了传说中的显眼包', v: 7, tag: 'storm' },
     { letter: 'B', text: '你被点名了。"小王你来说说"。你说"我同意张总的意见"，安全过关，经典操作', v: 4, tag: 'fox' },
     { letter: 'C', text: '你主动站起来，做了一个PPT都没讲完的方案。全场最亮的显眼包，闪瞎所有人', v: 8, tag: 'grind' },
-    { letter: 'D', text: '你假装在记笔记，其实在画小猪佩奇。已经画了第五只了，佩奇全家福快完成了', v: 3, tag: 'fish' }
+    { letter: 'D', text: '你假装在记笔记，其实在画光头强。已经画了第五只了，熊出没全集角色图鉴快完成了', v: 3, tag: 'fish' }
   ]},
   { title: '松弛感', text: '周五下午4:30，你的松弛感拉满了吗？', options: [
     { letter: 'A', text: '已经松弛了，从下午3点就开始摸鱼。心已经飞到了周末，身体还在工位苟着', v: 3, tag: 'fish' },
@@ -1388,11 +1438,23 @@ questionBanks['worker_junior'] = [
     { letter: 'C', text: '加速转动。升职加薪，齿轮转得飞快，我已经跟不上了，快要被甩出去了', v: 9, tag: 'grind' },
     { letter: 'D', text: '不确定。齿轮还在转，但不知道转去哪，随缘吧，转到哪算哪', v: 4, tag: 'buddha' }
   ]},
-  { title: '抽象', text: '老板说"这个需求很简单"，你打开文档后发现需求描述是："做一个像抖音但不是抖音的东西"——', options: [
+  { title: '抽象·初级版', text: '老板说"这个需求很简单"，你打开文档后发现需求描述是："做一个像抖音但不是抖音的东西"——', options: [
     { letter: 'A', text: '直接在群里回复"老板，你这个需求很抽象，能具体一点吗？"然后被已读不回', v: 7, tag: 'storm' },
     { letter: 'B', text: '开始做，做了三版都被否了。最后老板说"还是第一版好"，血压直接拉满', v: 8, tag: 'grind' },
     { letter: 'C', text: '拖延，先放三天。说不定老板自己就忘了这个需求，这是概率学', v: 4, tag: 'fish' },
     { letter: 'D', text: '已读乱回。"好的老板，我研究一下"然后继续做之前的事，完美', v: 3, tag: 'buddha' }
+  ]},
+  { title: 'AI评分', text: '公司引入了AI绩效系统，你的工作由AI打分，分数影响年终奖，你？', options: [
+    { letter: 'A', text: '开始研究AI评分算法——发现AI喜欢加班记录和"收到""好的"等关键词，于是开始疯狂发', v: 8, tag: 'ai' },
+    { letter: 'B', text: '深度焦虑，每天盯着AI评分看——比看股票还紧张，跌0.5分就睡不着', v: 6, tag: 'storm' },
+    { letter: 'C', text: '不care，AI评分再高也改变不了我摸鱼的事实——我摸鱼，AI评分，互不干扰', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '开始训练一个"反AI评分AI"，让AI帮我对付AI——但公司发现了，说我双重违规', v: 5, tag: 'grind' }
+  ]},
+  { title: '团建噩梦', text: '公司团建，主题是"篝火晚会才艺展示"，你被抽中第一个上台，你？', options: [
+    { letter: 'A', text: '站在台上沉默了三十秒，然后说"我给大家表演一个——沉默"，全场鼓掌', v: 8, tag: 'fox' },
+    { letter: 'B', text: '情急之下唱了一首《两只老虎》，跑调跑了三只老虎——但大家跟着一起唱了', v: 6, tag: 'storm' },
+    { letter: 'C', text: '假装肚子疼，在厕所里待了半小时，出来时晚会已经结束了——完美', v: 4, tag: 'fish' },
+    { letter: 'D', text: '主动上台，表演了办公室必备技能——三分钟泡咖啡，四分钟修打印机，五分钟写周报', v: 3, tag: 'grind' }
   ]}
 ];
 
@@ -1401,13 +1463,13 @@ questionBanks['worker_senior'] = [
   { title: '老登', text: '年轻同事在背后叫你"老登"，你听到了，你的反应？', options: [
     { letter: 'A', text: '微微一笑。"老登就老登，起码我有经验。你们这些小登还得叫我一声老师"', v: 3, tag: 'buddha' },
     { letter: 'B', text: '内心暴击。照镜子发现自己确实老了，头发少了，肚子大了，岁月不饶人', v: 8, tag: 'storm' },
-    { letter: 'C', text: '开始焦虑。被年轻人叫老登，意味着离被优化不远了，危机感拉满', v: 9, tag: 'ai' },
+    { letter: 'C', text: '开始焦虑。被年轻人叫老登，意味着离被优化不远了，危机感拉满', v: 9, tag: 'storm' },
     { letter: 'D', text: '当场回怼。"你叫我老登？那你是什么？小登西？"主打一个不服老', v: 6, tag: 'grind' }
   ]},
   { title: '示弱文化', text: '2026年流行"示弱文化"——在年轻人面前承认自己不行，你？', options: [
     { letter: 'A', text: '大方示弱。"这个新工具我不会，你来教教我？"其实心里很爽，终于不用装了', v: 3, tag: 'buddha' },
     { letter: 'B', text: '拒绝示弱。死要面子活受罪，半夜偷偷学，第二天假装一直都会，演技派', v: 8, tag: 'grind' },
-    { letter: 'C', text: '选择性示弱。会的假装不会，不会的假装会，主打一个薛定谔的能力，深不可测', v: 5, tag: 'think' },
+    { letter: 'C', text: '选择性示弱。会的假装不会，不会的假装会，主打一个薛定谔的能力，深不可测', v: 5, tag: 'grind' },
     { letter: 'D', text: '已经不想装了。示弱示到极致，年轻人觉得你什么都不会，开始教你用Excel', v: 7, tag: 'plant' }
   ]},
   { title: 'AI焦虑', text: 'AI能写代码、做PPT、写周报，你干了十年的事AI五分钟搞定，你？', options: [
@@ -1425,7 +1487,7 @@ questionBanks['worker_senior'] = [
   { title: '体检报告', text: '体检报告出来了，脂肪肝、尿酸高、腰椎间盘突出，你？', options: [
     { letter: 'A', text: '开始养生，办了健身卡。去了三次，然后卡在抽屉里吃灰，经典结局', v: 4, tag: 'fish' },
     { letter: 'B', text: '陷入焦虑。"我才35岁，身体已经这样了，45岁怎么办？"不敢想', v: 8, tag: 'storm' },
-    { letter: 'C', text: '把报告藏起来。"没看到就等于没问题，薛定谔的体检。"掩耳盗铃', v: 5, tag: 'buddha' },
+    { letter: 'C', text: '把报告藏起来。"没看到就等于没问题，量子体检。"掩耳盗铃', v: 5, tag: 'buddha' },
     { letter: 'D', text: '认真对待。每天跑步、控制饮食，三个月后复查，指标全正常了，狠人', v: 2, tag: 'grind' }
   ]},
   { title: '精力条', text: '你的精力条和二十岁时比，还剩多少？', options: [
@@ -1449,7 +1511,7 @@ questionBanks['worker_senior'] = [
   { title: '命运的齿轮2.0', text: '如果当初选了另一个offer/行业/城市，你的人生会怎样？', options: [
     { letter: 'A', text: '一定更好。"当初选了那个offer现在就是CEO了。"每天都在后悔，后悔是常态', v: 8, tag: 'storm' },
     { letter: 'B', text: '可能更差。"平行宇宙的我可能已经失业了，至少现在还有工作。"知足', v: 3, tag: 'buddha' },
-    { letter: 'C', text: '差不多。"人生就是不管怎么选都会后悔，这是宇宙定律。"哲学大师', v: 5, tag: 'think' },
+    { letter: 'C', text: '差不多。"人生就是不管怎么选都会后悔，这是宇宙定律。"哲学大师', v: 5, tag: 'buddha' },
     { letter: 'D', text: '不想了。"命运的齿轮已经锈死了，转不动了。"认命了', v: 6, tag: 'plant' }
   ]},
   { title: '爱你老己', text: '2026年，你学会了"爱你老己"吗？', options: [
@@ -1457,6 +1519,18 @@ questionBanks['worker_senior'] = [
     { letter: 'B', text: '正在学。"有时候爱自己，有时候卷自己，在两者之间反复横跳。"摇摆', v: 5, tag: 'think' },
     { letter: 'C', text: '没学会。"爱自己？房贷谁还？孩子谁养？没有资格爱自己。"现实', v: 8, tag: 'storm' },
     { letter: 'D', text: '过度爱自己。"已经躺了三个月了，谁来救救我。"从爱自己到放弃自己', v: 7, tag: 'plant' }
+  ]},
+  { title: 'AI危机', text: '年轻同事说"现在AI五分钟能做完的事，你以前要花一整天"，你？', options: [
+    { letter: 'A', text: '表面镇定，内心暴击——回家后偷偷问AI"我还能做什么"，AI沉默了', v: 8, tag: 'ai' },
+    { letter: 'B', text: '开始认真思考自己二十年的经验还有什么用——结论：经验值已经贬值，需要重新练级', v: 6, tag: 'storm' },
+    { letter: 'C', text: '无所谓。"AI再厉害也得有人按开机键——这个人就是我。"找到核心竞争力了', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '已经在学AI了，打算用AI"卷"回去——让年轻人知道姜还是老的辣', v: 5, tag: 'grind' }
+  ]},
+  { title: '同学聚会', text: '毕业二十年同学聚会，你发现当年的差生现在开保时捷，而你还在还房贷，你？', options: [
+    { letter: 'A', text: '在角落默默喝酒，假装手机有重要工作——其实在刷朋友圈，看别人怎么混这么好', v: 8, tag: 'fox' },
+    { letter: 'B', text: '回去后失眠三天，开始反思自己人生的每一个选择——从高考志愿到第一份工作', v: 6, tag: 'storm' },
+    { letter: 'C', text: '坦然面对。"我虽然没他有钱，但我掉的头发比他多——这也是一种成就。"', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '加了他的微信，决定向他学习——然后发现他每天凌晨四点起床，就放弃了', v: 4, tag: 'fish' }
   ]}
 ];
 
@@ -1465,19 +1539,19 @@ questionBanks['worker_freelance'] = [
   { title: '作息时区', text: '你的生物钟属于哪个时区？', options: [
     { letter: 'A', text: '北京时间，早睡早起，自律得像有单位的人。自由职业者的耻辱', v: 2, tag: 'grind' },
     { letter: 'B', text: '纽约时间，凌晨3点灵感爆发，下午3点起床。和国内客户有时差，完美错开', v: 5, tag: 'fish' },
-    { letter: 'C', text: '混沌时区，今天6点起明天16点起。窗帘从没拉开过，不知道外面是白天还是黑夜', v: 8, tag: 'storm' },
+    { letter: 'C', text: '混沌时区，今天6点起明天16点起。窗帘从没拉开过，不知道外面是白天还是黑夜', v: 8, tag: 'fish' },
     { letter: 'D', text: '已放弃时区概念。"时间是人类发明的，我是自由的。"哲学层面解决了问题', v: 6, tag: 'plant' }
   ]},
   { title: '甲方', text: '甲方第三次改需求，说"还是第一版好"，你的反应？', options: [
     { letter: 'A', text: '早就预料到了，第一版一直留着。就等你这句话，微笑.jpg，一切尽在掌握', v: 4, tag: 'buddha' },
     { letter: 'B', text: '内心暴击，但表面回复"好的呢亲，马上改~"。转头开始骂甲方，精分现场', v: 9, tag: 'storm' },
     { letter: 'C', text: '开始加钱。"改可以，但这是第三次了，费用要重新算。"专业，硬气', v: 3, tag: 'grind' },
-    { letter: 'D', text: '已经麻木了。"改吧改吧，反正第一版我都没删，你开心就好。"放弃抵抗', v: 5, tag: 'fish' }
+    { letter: 'D', text: '已经麻木了。"改吧改吧，反正第一版我都没删，你开心就好。"放弃抵抗', v: 5, tag: 'buddha' },
   ]},
   { title: '收入心电图', text: '你的月收入曲线最像什么？', options: [
     { letter: 'A', text: '稳步上升，业务越来越好，开始有稳定客户了。未来可期，终于熬出头了', v: 2, tag: 'grind' },
     { letter: 'B', text: '过山车，这个月撑死，下个月饿死。刺激但心脏受不了，需要速效救心丸', v: 8, tag: 'storm' },
-    { letter: 'C', text: '薛定谔的收入，我也不知道下个月钱从哪来。但好像总能活下来，神奇', v: 5, tag: 'think' },
+    { letter: 'C', text: '量子收入，我也不知道下个月钱从哪来。但好像总能活下来，神奇', v: 5, tag: 'think' },
     { letter: 'D', text: '一条直线，没钱，但也不焦虑了。已经习惯了贫穷，贫穷使我平静', v: 6, tag: 'plant' }
   ]},
   { title: '社交退化', text: '你上次和人说话是什么时候？', options: [
@@ -1495,7 +1569,7 @@ questionBanks['worker_freelance'] = [
   { title: '亲戚三连', text: '过年回家，亲戚问"你现在做什么工作？一个月赚多少钱？有对象吗？"——', options: [
     { letter: 'A', text: '已读乱回。"搞艺术的""做咨询的""互联网相关"，主打一个模糊，万能回答', v: 4, tag: 'fish' },
     { letter: 'B', text: '被暴击，回家后开始怀疑自己是不是"不务正业"。焦虑了三天，亲戚杀伤力MAX', v: 8, tag: 'storm' },
-    { letter: 'C', text: '自信回答。"自由职业，月入X万，对象？我选择和自由在一起。"凡尔赛', v: 2, tag: 'buddha' },
+    { letter: 'C', text: '自信回答。"自由职业，月入X万，对象？我选择和自由在一起。"凡尔赛', v: 2, tag: 'grind' },
     { letter: 'D', text: '逃避。"我去上个厕所。"然后在厕所待了半小时，出来时亲戚已经换话题了', v: 6, tag: 'fox' }
   ]},
   { title: '上头', text: '2026年新词"入魅"——自由职业者最容易被什么入魅？', options: [
@@ -1504,7 +1578,7 @@ questionBanks['worker_freelance'] = [
     { letter: 'C', text: '被"数字游民"概念上头了。在巴厘岛办公的幻想，支撑着我在出租屋里工作', v: 5, tag: 'think' },
     { letter: 'D', text: '被床上头了，床是我的本体。我已经和床融为一体了，不可分割', v: 4, tag: 'plant' }
   ]},
-  { title: '偷感', text: '自由职业者的"偷感"体现在哪里？', options: [
+  { title: '偷感·自由职业版', text: '自由职业者的"偷感"体现在哪里？', options: [
     { letter: 'A', text: '工作日去商场，感受到上班族异样的目光。假装自己是来见客户的，演技上线', v: 6, tag: 'fox' },
     { letter: 'B', text: '在咖啡厅办公，点一杯咖啡坐4小时。每次服务员路过都假装在开会，心累', v: 5, tag: 'fish' },
     { letter: 'C', text: '完全不偷感。"我自由职业我骄傲，我下午三点逛公园怎么了？"理直气壮', v: 2, tag: 'buddha' },
@@ -1521,131 +1595,199 @@ questionBanks['worker_freelance'] = [
     { letter: 'B', text: '逐渐稳定，找到了节奏。客户稳定了，收入稳定了，自由职业真香', v: 2, tag: 'buddha' },
     { letter: 'C', text: '在考虑回去上班。"自由了一年，发现上班至少有人帮你交社保。"现实', v: 6, tag: 'think' },
     { letter: 'D', text: '已经佛了。"管他抽象不抽象，活着就行，自由最重要。"境界到了', v: 4, tag: 'plant' }
+  ]},
+  { title: 'AI抢饭碗', text: '客户说"我用AI就能做，为什么还要花钱请你？"，你？', options: [
+    { letter: 'A', text: '开始焦虑——AI真的能取代我？连夜研究自己的不可替代性，结论：没有', v: 8, tag: 'ai' },
+    { letter: 'B', text: '冷静回复"那您试试AI做的效果"，然后等了三天——客户默默回来找你了', v: 4, tag: 'buddha' },
+    { letter: 'C', text: '开始研究AI，发现AI确实能做——但AI不会半夜给你改稿、不会陪你聊需求、不会说"马上改"', v: 5, tag: 'think' },
+    { letter: 'D', text: '直接把AI生成的成品发给客户，结果客户说"还是你之前做的好"——AI完败', v: 3, tag: 'grind' }
+  ]},
+  { title: '线下恐惧', text: '一个长期线上沟通的客户突然说"我们见一面吧"，你看着自己三个月没理的头发，你？', options: [
+    { letter: 'A', text: '心跳加速，开始想各种理由推脱——"最近出差""疫情影响""我腿断了"', v: 8, tag: 'fox' },
+    { letter: 'B', text: '答应了，但见面那天穿了最正式的衣服，发现客户穿着拖鞋来了——尴尬加倍', v: 6, tag: 'storm' },
+    { letter: 'C', text: '见面后意外发现聊得很开心——然后回家继续社恐，下次见面又是三个月后', v: 3, tag: 'buddha' },
+    { letter: 'D', text: '直接说"我社恐，咱们继续线上吧"，客户说"我也是，太好了"——双向奔赴', v: 4, tag: 'fish' }
   ]}
 ];
 
 /* ═══════════════════════════════════════════════════════════════
-   PRESCRIPTION POOLS — 精简版（3-4条/池，学生/社会人区分）
+   PRESCRIPTION POOLS — 抽象无厘头版（小朋友/学生/社会人三分）
    ═══════════════════════════════════════════════════════════════ */
 var rxPools = {
-  student: {
+  preschool: {
     severe: [
       [
-        { emoji: '🏥', name: '强制数字戒断（住院级）', dose: '每日22:00-次日08:00 | 手机物理隔离', note: '将手机锁在另一个房间的抽屉里，钥匙交给室友/家人保管。戒断反应包括：手指不自觉滑动、每隔3分钟看手腕、产生"有人找我"的幻觉。属正常现象，坚持3天症状缓解。' },
-        { emoji: '💉', name: '火锅续命滴注', dose: '每周2次 | 鸳鸯锅底·微辣起步', note: '毛肚涮7秒疗效最佳。建议搭配：鸭血（补血）、脑花（补脑）、藕片（通气）。禁忌：一个人吃，孤独会中和药效。' },
-        { emoji: '🔪', name: '学习群切除手术', dose: '立即执行 | 仅保留3个群', note: '保留：班级通知群、密友群、外卖红包群。其余全部退出。术后可能出现"FOMO戒断反应"，建议用"已读不回特训"辅助治疗。' },
-        { emoji: '💊', name: '躺平素缓释片', dose: '每日1次 | 每次至少12小时', note: '饭后睡前均可服用，最佳服用方式：躺在床上什么都不做。副作用：可能被家长/老师骂。应对：出示本处方，告诉他们这是医生开的。' }
+        { emoji: '🫧', name: '哈基米情绪气泡贴', dose: '每日3次 | 贴于额头', note: '撕开会冒出"哈基米"音效的透明气泡。气泡飘走时带走10%的哭闹情绪，剩下90%靠睡一觉。' },
+        { emoji: '🍼', name: '薛定谔的奶嘴', dose: '含于口中 | 直到观察为止', note: '不看它时既是奶味又是草莓味，一看就塌缩成你不喜欢的那种。禁止让妈妈观察。' },
+        { emoji: '🦕', name: '恐龙基因唤醒液', dose: '睡前1滴 | 滴于枕头', note: '让你在梦里变成霸王龙，吃掉所有让你害怕的题。副作用：第二天可能想用脚踢门。' },
+        { emoji: '🌙', name: '反睡不着咒语', dose: '每晚1次 | 念三遍', note: '咒语："我不睡，我不睡，我不——"通常念到第二遍就睡着了。有效率97%。' }
       ],
       [
-        { emoji: '🫖', name: '枸杞红枣安神汤', dose: '每日1剂 | 保温杯500ml冲泡', note: '配方：枸杞20粒+红枣3颗+桂圆5颗+冰糖少许。功效：专治"看到同学保研/拿offer"引起的焦虑。注意：养生从青年抓起，不丢人。' },
-        { emoji: '🧘', name: '摸鱼吐纳法', dose: '每日3次 | 每次15分钟', note: '操作：闭眼，深呼吸，假装在思考难题。实际上脑子里可以想任何事——今晚吃什么、周末去哪玩。关键是表情要严肃，眉头微皱效果更佳。' },
-        { emoji: '📱', name: '手机装死贴', dose: '周末全天 | 自动回复开启', note: '自动回复："此人已死，有事烧纸，急事挖坟。" 注意：此回复仅对非紧急联系人使用，对老师使用后果自负。' },
-        { emoji: '🤫', name: '已读不回特训营', dose: '每日训练 | 对所有非紧急消息', note: '训练心法：看了就是回了，心里回了也算回了。初级：已读不回。中级：不读不回。高级：读了但忘记了回。终极：你根本不记得有这条消息。' }
+        { emoji: '🧸', name: '毛绒玩具议事会', dose: '开会时 | 全员到场', note: '小熊当主席，兔子当副主席，你当观众。议题：今天要不要吃冰淇淋。表决结果：一致通过。' },
+        { emoji: '🍬', name: '情绪彩虹糖', dose: '生气时1颗 | 含到化', note: '红色治生气，黄色治委屈，蓝色治不想写作业。绿色是韭菜味，没人爱吃，但治嘴硬。' },
+        { emoji: '🚀', name: '去月球单程票', dose: '想哭时使用 | 不可退票', note: '月球上没人催你睡觉，也没人让你写作业。但月球上没有WiFi——你确定要去？' },
+        { emoji: '⚡', name: '静电情绪释放器', dose: '随时 | 摸金属前使用', note: '把心里的不爽变成指尖的电。摸门把手时"啪"一声，烦恼被电走了——但也会被电哭。' }
       ],
       [
-        { emoji: '🎮', name: '游戏放松颗粒（处方版）', dose: '每日2小时 | 仅限单机游戏', note: '推荐：原神、崩坏：星穹铁道、光遇。禁忌：王者荣耀、LOL、任何需要开麦的游戏——队友骂你会让精神内耗值翻倍。' },
-        { emoji: '📦', name: '快递期待素', dose: '每周至少1个快递在路上', note: '随便买点什么，让生活有个盼头。原理：拆快递的快乐是纯粹且无副作用的。注意：此药容易上瘾，请控制剂量。' },
-        { emoji: '🎵', name: '土味神曲洗耳液', dose: '每日3首 | 音量70%', note: '推荐曲目：《爱你老己》《入魅》《地球online 2.0》。原理：用更强烈的精神刺激覆盖原有的精神内耗，以毒攻毒。' },
-        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '治疗期间禁止：刷朋友圈超过15分钟、睡前看消息、和卷王比成绩、思考人生意义。违者药效清零，需重新挂号。' }
+        { emoji: '🎨', name: '反重力涂鸦笔', dose: '每日1张 | 画在空气里', note: '画出来的东西会飘起来，5分钟后消失。所以你画的丑东西没人能看见——这是它最大的优点。' },
+        { emoji: '🦄', name: '独角兽语音翻译器', dose: '戴于耳边 | 全天', note: '把"快点写作业"翻译成"独角兽在等你"。把"别看电视了"翻译成"独角兽饿了"。' },
+        { emoji: '🌙', name: '梦境快进遥控器', dose: '做噩梦时按⏩', note: '直接跳到梦的结尾。如果结尾是噩梦的高潮——禁止使用此遥控器。' },
+        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '治疗期间禁止：和妈妈比谁更能熬夜、在爸爸工作时爬到他头上、思考"为什么大人不用写作业"。违者药效清零。' }
       ]
     ],
     moderate: [
       [
-        { emoji: '🛏️', name: '周末自然醒胶囊', dose: '每周1次 | 不设闹钟，睡到自然醒', note: '自然醒是世界上最温柔的闹钟。醒来后允许赖床30分钟，此期间只能刷搞笑视频，禁止看任何让你焦虑的内容。' },
-        { emoji: '🍲', name: '火锅预防接种', dose: '每两周1次 | 鸳鸯锅底', note: '预防胜于治疗。研究表明，每月吃2次火锅的学生精神健康指数比不吃火锅的学生高37%。' },
-        { emoji: '📵', name: '朋友圈限流术', dose: '每日浏览不超过15分钟', note: '别人的人生不值得你花太多时间观看。设置一个15分钟倒计时，时间一到立刻关掉。' }
+        { emoji: '🦋', name: '蝴蝶效应抑制剂', dose: '每日1次 | 拍翅膀前', note: '防止你拍一下翅膀引发龙卷风。剂量过大可能导致你完全无法引起任何注意。' },
+        { emoji: '🎵', name: '儿歌黑洞发生器', dose: '听1遍即可 | 不可重复', note: '《两只老虎》吸走20%的不开心，但会留在脑子里循环72小时——属正常副作用。' },
+        { emoji: '🌈', name: '彩虹桥检修贴', dose: '雨后使用', note: '彩虹桥偶尔接触不良导致许愿失灵。贴上去后愿望会被转发到24小时内处理。' }
       ],
       [
-        { emoji: '📺', name: '追剧放松片', dose: '每日1集 | 睡前服用', note: '推荐喜剧、美食番、治愈番。禁忌：悬疑剧（脑子停不下来）、校园剧（容易代入）。推荐：《武林外传》重刷，百看不厌。' },
-        { emoji: '😴', name: '午睡充电片', dose: '每日20分钟 | 13:00-15:00之间', note: '超过30分钟会进入深度睡眠，醒来后更累且伴有"我是谁我在哪"的迷茫感。20分钟是黄金时长。' },
-        { emoji: '🌳', name: '公园20分钟疗法', dose: '每日1次 | 不限时段', note: '在公园里坐20分钟就能显著降低压力激素水平。不需要运动，只需要坐在长椅上——看树、看云、看别人遛狗。' }
+        { emoji: '🐝', name: '嗡嗡情绪蜂鸣器', dose: '无聊时1次', note: '会发出蜜蜂的嗡嗡声。没人知道为什么这能让人开心，但确实有效。可能是基因里的本能。' },
+        { emoji: '🪁', name: '风筝线情绪牵引术', dose: '有风时 | 放飞', note: '把坏情绪绑在风筝上放出去。线断了就彻底好了；没断就慢慢收回来——可能收回来时变成了好情绪。' },
+        { emoji: '🫧', name: '汽水气泡对话器', dose: '喝汽水时', note: '汽水的气泡会告诉你秘密。比如"今天的作业可以明天再写"。但说完就消失了，你不信也没办法。' }
       ],
       [
-        { emoji: '🎨', name: '创作释放剂', dose: '每周1次 | 不限形式', note: '画画、写字、唱歌、做手工——随便什么，表达即治愈。不需要专业水平，丑也有丑的快乐。重点：不是为了给别人看，是为了给自己看。' },
-        { emoji: '📖', name: '纸质书眼药水', dose: '每日30分钟 | 睡前使用', note: '远离屏幕，让眼睛和大脑同时休息。推荐：小说、散文、漫画，不要读成功学/自我提升类——那些是精神内耗的源头。' },
-        { emoji: '🧹', name: '整理收纳疗法', dose: '每周1次 | 整理一个角落', note: '整理房间=整理心情。看着乱七八糟的书桌变整洁，会产生一种"我可以掌控人生"的错觉——这种错觉本身就有治疗效果。' }
+        { emoji: '🪄', name: '魔法棒保修卡', dose: '失效时使用', note: '魔法棒不灵了？可能是保修期过了。拿这张卡去最近的童话镇售后点续费——地点：你的枕头底下。' },
+        { emoji: '🍀', name: '四叶草情绪滤纸', dose: '难过时夹一片', note: '把难过的事用四叶草包起来，会变成"还行的事"。副作用：连续使用会让所有事都"还行"，包括不及格的试卷。' },
+        { emoji: '🌙', name: '月亮充电宝', dose: '满月时充满 | 平时备用', note: '满月充100%，新月充0%。新月那天请自己发光——或者早点睡觉。' }
       ]
     ],
     normal: [
       [
-        { emoji: '🛏️', name: '赖床自由权', dose: '每周1次 | 不设时限', note: '您精神状况良好，但赖床是人生基本乐趣之一。允许在床上吃早餐、刷手机、发呆——这是健康人的特权。' },
-        { emoji: '🍲', name: '庆祝火锅', dose: '每月1-2次 | 呼朋引伴', note: '庆祝您精神健康！多叫几个朋友，把本处方给他们看，让他们羡慕一下。' },
-        { emoji: '😊', name: '继续保持', dose: '长期坚持 | 无需调整', note: '您是我院的骄傲，是精神健康的标兵。请继续保持当前状态，如果哪天感觉不对劲了，欢迎随时回来复查。' }
+        { emoji: '⭐', name: '星星收集许可证', dose: '夜间使用 | 不限颗数', note: '允许你收集夜空中的星星，每颗兑换1个愿望。兑换地点：童话镇广场许愿池。' },
+        { emoji: '🎈', name: '气球情绪分流器', dose: '开心时充1个', note: '把多余的开心充进气球系好。难过时解开——如果气球还没飞走的话。' },
+        { emoji: '🌸', name: '春天发芽通知书', dose: '春分当日', note: '通知你：你已经是一颗可以发芽的种子。找一块土，把自己种下去，等下雨。' }
       ],
       [
-        { emoji: '🏆', name: '精神健康标兵', dose: '无需治疗 | 建议定期维护', note: '恭喜！你是这个世界的稀有物种——精神健康的人。请继续保持，这个世界需要你这样的正常人。建议每半年复查一次。' },
-        { emoji: '📚', name: '阅读充电', dose: '每日30分钟 | 纸质书更佳', note: '不是治疗，是保养。像给车做保养一样，定期给大脑输入优质内容。推荐：小说、历史、科普——就是别看成功学。' },
-        { emoji: '🌞', name: '阳光补充', dose: '每日15分钟 | 户外最佳', note: '光合作用是人类的基本需求。晒太阳不仅补钙，还补心情。阴天也请出门，紫外线会穿透云层——科学说的。' }
+        { emoji: '🦊', name: '悄悄话树洞', dose: '想说话时', note: '对着树洞说任何话，树洞只会回答"嗯"。最适合倾诉秘密的地方。但每次说完树洞会掉一片叶子——大概嫌你话太多。' },
+        { emoji: '🪨', name: '情绪石头宠物', dose: '领养1块 | 终身', note: '不会死、不会饿、不会叫，只会陪你。可以给它画脸——画笑脸它就笑，画哭脸它就哭。情绪稳定，远超你。' },
+        { emoji: '🫧', name: '泡泡语言课', dose: '每周1节', note: '教你用泡泡说话。大的泡泡是"你好"，小的泡泡是"再见"，连吹三个是"今天不想上学"。' }
       ],
       [
-        { emoji: '💤', name: '美容觉', dose: '每日8小时 | 23:00前入睡', note: '皮肤好、心情好、精神好，一举三得。睡眠是上帝给人类最好的免费药，可惜很多人不吃。' },
-        { emoji: '🏃', name: '快乐运动', dose: '每周3次 | 选你喜欢的', note: '不是因为需要减肥，而是因为运动让人快乐。选一个你真正喜欢的运动——跳舞、打球、游泳，而不是在健身房痛苦地举铁。' },
-        { emoji: '❤️', name: '关爱他人', dose: '随时 | 量力而行', note: '你的精神健康已经是稀缺资源了。如果有多余的能量，可以分一点给身边精神内耗的朋友。但记住：先照顾好自己，再照顾别人。' }
+        { emoji: '🐌', name: '蜗牛速度通行证', dose: '想慢的时候', note: '持有此证可以蜗牛速度做事。妈妈催也没用——这是医生开的。副作用：脚可能变黏。' },
+        { emoji: '🎁', name: '惊喜盲盒（每日款）', dose: '每日拆1个', note: '里面可能是开心、平淡、或"什么都没有"。但拆开的过程本身就是礼物。' },
+        { emoji: '🌙', name: '梦境存档点', dose: '睡前存档 | 醒来读档', note: '把今天的好梦存档，明天继续做。坏梦不存档，醒来自动删除。偶尔会读档失败，做成相反的梦。' }
+      ]
+    ]
+  },
+  student: {
+    severe: [
+      [
+        { emoji: '🧋', name: '薛定谔的奶茶', dose: '每日1杯 | 不许看', note: '没喝之前既是三分糖又是全糖，既是去冰又是常温。喝下去就塌缩成你最不想要的那种。' },
+        { emoji: '🪫', name: '精神内耗蓄电池', dose: '随时 | 放电即可', note: '收集你脑子里两个小人打架产生的能量。攒够100%可以给手机充一次电。属绿色能源。' },
+        { emoji: '👻', name: '已读乱回抗体', dose: '每日3次 | 饭前', note: '免疫"哈哈哈哈然后呢"式无效回复。副作用：你会开始用"嗯""哦""？"回复别人，社交关系可能崩盘。' },
+        { emoji: '💀', name: '脆皮修复贴', dose: '贴于脆弱部位 | 每周2贴', note: '专治"被说两句就破防""考试一难就崩溃"。每贴抗1次精神暴击，贴满12周进化成"韧性皮肤"。' }
+      ],
+      [
+        { emoji: '🌀', name: '摸鱼量子叠加态发生器', dose: '上课时开启 | 持续45分钟', note: '让你同时处于"在认真听课"和"在走神"两种状态。老师提问时坍缩为其中一种——概率各50%。' },
+        { emoji: '🫠', name: '班味中和喷雾', dose: '考前3喷 | 喷于头顶', note: '专治"一上学就变样""放假活蹦乱跳上学半死不活"综合征。但喷雾含"作业"成分，喷多了会想写作业。' },
+        { emoji: '🪞', name: '平行宇宙观测镜', dose: '焦虑时照1次', note: '让你看看平行宇宙里那个"没选你这条路"的自己。看完会发现——他也焦虑。这没什么大不了。' },
+        { emoji: '🎵', name: '土味神曲疫苗', dose: '每月1针 | 永久免疫', note: '免疫《爱你老己》《地球online》等神曲的洗脑。副作用：你会听不懂同学的梗，逐渐边缘化。' }
+      ],
+      [
+        { emoji: '📦', name: '快递期待素缓释剂', dose: '每周1个快递在路上', note: '让生活有个盼头。比"考上理想学校"近，比"周末"远。性价比最高的精神支柱。' },
+        { emoji: '🎮', name: '游戏时长膨胀器', dose: '每日2小时 | 实际3小时', note: '让1小时的游戏时间感觉像3小时。但现实时间还是1小时——作业还是写不完。本药不解决物理问题。' },
+        { emoji: '📡', name: '社交能量信号放大器', dose: '聚会前1次', note: '把微弱的"想社交"信号放大10倍。缺点：信号过强可能吸引到你不想社交的人。请精确控制剂量。' },
+        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '禁止：凌晨2点刷"XXX高考分数"、和保研的同学说话、看《繁花》学宝总做事。违者药效清零，需重新挂号。' }
+      ]
+    ],
+    moderate: [
+      [
+        { emoji: '🧊', name: '情绪冰沙搅拌机', dose: '心情乱时搅拌1次', note: '把乱七八糟的情绪搅成均匀的冰沙。喝下去什么味都有，也什么味都没有——这就是青春的情绪。' },
+        { emoji: '🫧', name: '哈基米气泡吸入剂', dose: '每日3次 | 深呼吸', note: '吸入后产生5分钟"世界很可爱"的幻觉。幻觉期间请勿做重大决定（比如给喜欢的人发消息）。' },
+        { emoji: '🐌', name: '蜗牛节奏同步器', dose: '焦虑时贴于手背', note: '让你以蜗牛的速度做事。交作业慢、回消息慢、走路慢。但慢得心安理得——因为这是医生开的。' }
+      ],
+      [
+        { emoji: '🎲', name: '人生骰子（六面款）', dose: '纠结时掷1次', note: '六面写：做、不做、明天再说、问妈妈、抛硬币、再掷一次。掷到的必须执行——除非掷到"再掷一次"。' },
+        { emoji: '🪵', name: '木鱼敲击疗法', dose: '每日108下 | 随时', note: '每敲一下消除一个杂念，108下后杂念清零。但也会困得想睡——这既是副作用，也是功能。' },
+        { emoji: '🗺️', name: '精神GPS导航仪', dose: '迷茫时开启', note: '会告诉你"前方500米是考场，请继续前行"。但不告诉你终点在哪——所以它没什么用，但声音很好听。' }
+      ],
+      [
+        { emoji: '🧃', name: '情绪果汁盒', dose: '每日1盒 | 插吸管', note: '第一口是开心的味道，第二口是难过的味道，第三口是"什么味都不是"的味道。第三口是人生。' },
+        { emoji: '🪟', name: '窗户发呆许可证', dose: '每日30分钟 | 凭窗', note: '允许你对着窗外发呆。期间不许想任何事，尤其不许想"我为什么要对着窗外发呆"。' },
+        { emoji: '📻', name: '宇宙电台调频器', dose: '失眠时调台', note: '收到平行宇宙的电台。节目内容：另一个你在做同样的事，但比你做得更糟。听完会好受很多。' }
+      ]
+    ],
+    normal: [
+      [
+        { emoji: '🌟', name: '精神健康徽章（铜款）', dose: '佩戴于胸口 | 长期', note: '证明你是精神状态尚可的人。集齐3个铜款兑换1个银款。集齐3个银款可兑换——更好的自己。' },
+        { emoji: '🎈', name: '多余快乐气球', dose: '开心时充1个', note: '把多余的开心充进气球系好。难过时解开——如果气球还没飞走的话。' },
+        { emoji: '🪴', name: '心情盆栽', dose: '养1盆 | 每日浇水', note: '你的心情会影响它生长。心情好它开花，心情差它掉叶子。它会比你先知道你抑郁了。' }
+      ],
+      [
+        { emoji: '🦔', name: '刺猬社交距离仪', dose: '聚会时佩戴', note: '想独处时长出刺，想社交时收起刺。但有时失控——想独处时刺收不起来，想社交时刺竖起来。' },
+        { emoji: '🌙', name: '月亮许愿转发服务', dose: '满月时1次', note: '愿望会被转发给月亮。月亮不保证实现，但保证倾听。新月的愿望进入垃圾箱——那时月亮不在班。' },
+        { emoji: '📮', name: '未来明信片', dose: '每月寄1张', note: '写给5年后的自己。5年后你会收到，并发现——你现在担心的事，5年后一件都不记得了。' }
+      ],
+      [
+        { emoji: '🎨', name: '丑画释放贴', dose: '每周1张 | 越丑越好', note: '画得越丑释放效果越好。画完撕掉，不许给任何人看——这是唯一一个有保密协议的处方。' },
+        { emoji: '🐌', name: '人生进度条（蜗牛版）', dose: '长期使用', note: '别人的人生进度条是高铁，你的是蜗牛。但蜗牛也能到终点，只是会路过更多风景——以及更多坑。' },
+        { emoji: '🍀', name: '运气补给包（小）', dose: '每月1包', note: '装着10次"刚好赶上公交""老师没叫我""作业忘带也没事"的小运气。用完即止，下月再来。' }
       ]
     ]
   },
   worker: {
     severe: [
       [
-        { emoji: '🏥', name: '强制数字戒断（住院级）', dose: '每日22:00-次日08:00 | 手机物理隔离', note: '将手机锁在另一个房间的抽屉里，钥匙交给伴侣/室友保管。戒断反应包括：手指不自觉滑动、每隔3分钟看手腕、产生"老板找我"的幻觉。属正常现象，坚持3天症状缓解。' },
-        { emoji: '💉', name: '火锅续命滴注', dose: '每周2次 | 鸳鸯锅底·微辣起步', note: '毛肚涮7秒疗效最佳。建议搭配：鸭血（补血）、脑花（补脑）、藕片（通气）。禁忌：一个人吃，孤独会中和药效。' },
-        { emoji: '🔪', name: '工作群切除手术', dose: '立即执行 | 仅保留3个群', note: '保留：家庭群、密友群、外卖红包群。其余全部退出。术后可能出现"FOMO戒断反应"，建议用"已读不回特训"辅助治疗。' },
-        { emoji: '💊', name: '躺平素缓释片', dose: '每日1次 | 每次至少12小时', note: '饭后睡前均可服用，最佳服用方式：躺在床上什么都不做。副作用：可能被伴侣/领导骂。应对：出示本处方，告诉他们这是医生开的。' }
+        { emoji: '🧋', name: '薛定谔的奶茶（社会版）', dose: '每日1杯 | 不许看', note: '没喝之前既是续命水又是糖衣炮弹。喝下去塌缩成"月底血糖超标"那种。但还是要喝。' },
+        { emoji: '🪫', name: '班味提取器', dose: '下班后 | 1次', note: '把身上的"班味"提取出来。班味是淡黄色液体，闻起来像打印机墨水。倒掉前请拍照留存——这是你今天的工作量证明。' },
+        { emoji: '💸', name: '工资到账情绪缓冲剂', dose: '发薪日 | 提前3天服用', note: '让你在工资到账时不至于哭出来。含"冷静成分"，能让你平静接受"工资比想象中少"这件事。' },
+        { emoji: '👻', name: '已读不回量子隧穿器', dose: '收到消息时 | 立即', note: '让"已读"状态在0.01秒内隧穿到"未读"。物理上你已读，但系统永远不知道。老板问起就说信号不好。' }
       ],
       [
-        { emoji: '🫖', name: '枸杞红枣安神汤', dose: '每日1剂 | 保温杯500ml冲泡', note: '配方：枸杞20粒+红枣3颗+桂圆5颗+冰糖少许。功效：专治"看到同龄人升职加薪"引起的焦虑。注意：中年养生从青年抓起，不丢人。' },
-        { emoji: '🧘', name: '摸鱼吐纳法', dose: '每日3次 | 每次15分钟', note: '操作：闭眼，深呼吸，假装在思考重要问题。实际上脑子里可以想任何事——今晚吃什么、周末去哪玩。关键是表情要严肃，眉头微皱效果更佳。' },
-        { emoji: '📱', name: '手机装死贴', dose: '周末全天 | 自动回复开启', note: '自动回复："此人已死，有事烧纸，急事挖坟。" 注意：此回复仅对非紧急联系人使用，对老板使用后果自负。' },
-        { emoji: '🤫', name: '已读不回特训营', dose: '每日训练 | 对所有非紧急消息', note: '训练心法：看了就是回了，心里回了也算回了。初级：已读不回。中级：不读不回。高级：读了但忘记了回。终极：你根本不记得有这条消息。' }
+        { emoji: '🌀', name: '摸鱼平行宇宙发生器', dose: '上班时开启 | 8小时', note: '让你在A宇宙摸鱼，B宇宙上班。A宇宙的你很开心，B宇宙的你在写日报。本药只对A宇宙生效。' },
+        { emoji: '🫠', name: '脆皮青年修复贴', dose: '贴于脆弱处 | 每周2贴', note: '专治"被领导一句"改一下"就破防""KPI差0.1%就崩溃"。贴满12周进化成"社畜外壳"。' },
+        { emoji: '🪞', name: '同事滤镜观测镜', dose: '开会时佩戴', note: '让你看到同事"光鲜"外表下的真实状态——他们也在摸鱼、也想辞职、也觉得老板的方案很傻。但看完不能说。' },
+        { emoji: '💼', name: '工位精神结界发生器', dose: '到工位即开 | 到下班', note: '在工位周围生成1.5米精神结界。老板画饼、同事吐槽、客户脏话全部弹开。结界内只有你和你的奶茶。' }
       ],
       [
-        { emoji: '🎮', name: '游戏放松颗粒（处方版）', dose: '每日2小时 | 仅限单机游戏', note: '推荐：原神、崩坏：星穹铁道、光遇。禁忌：王者荣耀、LOL、任何需要开麦的游戏——队友骂你会让精神内耗值翻倍。' },
-        { emoji: '📦', name: '快递期待素', dose: '每周至少1个快递在路上', note: '随便买点什么，让生活有个盼头。原理：拆快递的快乐是纯粹且无副作用的。注意：此药容易上瘾，请控制剂量，不要月底还花呗时再来看精神科。' },
-        { emoji: '🎵', name: '土味神曲洗耳液', dose: '每日3首 | 音量70%', note: '推荐曲目：《爱你老己》《入魅》《地球online 2.0》。原理：用更强烈的精神刺激覆盖原有的精神内耗，以毒攻毒。' },
-        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '治疗期间禁止：刷朋友圈超过15分钟、睡前看工作消息、和卷王比业绩、思考人生意义。违者药效清零，需重新挂号。' }
+        { emoji: '🚇', name: '通勤时空压缩装置', dose: '上下班时 | 1次', note: '让1小时地铁变成5分钟。原理：压缩时空里听不到"麻烦让一让"和报站声。但下车后你会觉得亏了2小时。' },
+        { emoji: '🎮', name: '下班后人格分裂剂', dose: '每日1次 | 到家即用', note: '把"公司你"和"家里你"彻底分开。公司你是张三，家里你是李四。副作用：可能忘记自己叫什么。' },
+        { emoji: '🎵', name: '土味神曲情绪覆盖液', dose: '烦躁时1首 | 音量80%', note: '用《爱你老己》覆盖一切负面情绪。副作用：会不自觉哼出声，在电梯里被邻居听见——但这其实是宣传。' },
+        { emoji: '⚠️', name: '【禁忌事项】', dose: '', note: '禁止：算"这辈子还能赚多少钱"、看同龄人朋友圈、凌晨3点刷招聘软件、思考"人生意义"。违者药效清零。' }
       ]
     ],
     moderate: [
       [
-        { emoji: '🛏️', name: '周末自然醒胶囊', dose: '每周1次 | 不设闹钟，睡到自然醒', note: '自然醒是世界上最温柔的闹钟。醒来后允许赖床30分钟，此期间只能刷搞笑视频，禁止看任何让你焦虑的内容。' },
-        { emoji: '🍲', name: '火锅预防接种', dose: '每两周1次 | 鸳鸯锅底', note: '预防胜于治疗。研究表明，每月吃2次火锅的上班族精神健康指数比不吃火锅的上班族高37%。' },
-        { emoji: '📵', name: '朋友圈限流术', dose: '每日浏览不超过15分钟', note: '别人的人生不值得你花太多时间观看。设置一个15分钟倒计时，时间一到立刻关掉。' }
+        { emoji: '🧊', name: '情绪冰美式搅拌器', dose: '上午10点 | 搅拌3次', note: '把混乱情绪搅成冰美式。喝下去又苦又醒，但至少不是"假装快乐"的甜——这是成年人能接受的味道。' },
+        { emoji: '🫧', name: '哈基米气泡解压剂', dose: '午休时1次', note: '产生5分钟"世界很可爱"的幻觉。幻觉期间请勿打开工作群、邮件、钉钉——否则幻觉会变成噩梦。' },
+        { emoji: '🐌', name: '反向内卷同步器', dose: '同事卷时开启', note: '让同事的内卷能量反向作用于你——他越卷，你越想躺。你会成为办公室最淡定的人，也可能被裁。' }
       ],
       [
-        { emoji: '📺', name: '追剧放松片', dose: '每日1集 | 睡前服用', note: '推荐喜剧、美食番、治愈番。禁忌：悬疑剧（脑子停不下来）、职场剧（容易代入）。推荐：《武林外传》重刷，百看不厌。' },
-        { emoji: '😴', name: '午睡充电片', dose: '每日20分钟 | 13:00-15:00之间', note: '超过30分钟会进入深度睡眠，醒来后更累且伴有"我是谁我在哪"的迷茫感。20分钟是黄金时长。' },
-        { emoji: '🌳', name: '公园20分钟疗法', dose: '每日1次 | 不限时段', note: '在公园里坐20分钟就能显著降低压力激素水平。不需要运动，只需要坐在长椅上——看树、看云、看别人遛狗。' }
+        { emoji: '🧧', name: '工资劫持防护罩', dose: '发薪日 | 24小时', note: '防止工资在24小时内被花呗、信用卡、房租劫走。但只能用一次，月底还是没钱——这不是药的问题。' },
+        { emoji: '🪵', name: '电子木鱼（PLUS版）', dose: '每日108下 | 随时', note: '比普通木鱼多一项：每敲一下自动存1毛到"精神退休基金"。敲满108下存10.8元——按这速度65岁能退休。' },
+        { emoji: '🧭', name: '人生方向GPS（低电量）', dose: '迷茫时开启 | 续航3分钟', note: '会告诉你"前方500米是出租屋，请继续前行"。但不告诉你人生方向。3分钟后自动关机——它也不知道。' }
       ],
       [
-        { emoji: '🎨', name: '创作释放剂', dose: '每周1次 | 不限形式', note: '画画、写字、唱歌、做手工——随便什么，表达即治愈。不需要专业水平，丑也有丑的快乐。重点：不是为了给别人看，是为了给自己看。' },
-        { emoji: '📖', name: '纸质书眼药水', dose: '每日30分钟 | 睡前使用', note: '远离屏幕，让眼睛和大脑同时休息。推荐：小说、散文、漫画，不要读成功学/自我提升类——那些是精神内耗的源头。' },
-        { emoji: '🧹', name: '整理收纳疗法', dose: '每周1次 | 整理一个角落', note: '整理房间=整理心情。看着乱七八糟的办公桌变整洁，会产生一种"我可以掌控人生"的错觉——这种错觉本身就有治疗效果。' }
+        { emoji: '🛋️', name: '沙发陷落加速器', dose: '下班后 | 1次', note: '让你以2倍速度陷进沙发。陷进去后无法起身，直到明天闹钟响。是治疗"还想再卷一会"的特效药。' },
+        { emoji: '🪟', name: '窗户发呆许可证（社会版）', dose: '每日30分钟 | 凭窗', note: '允许你对着窗外发呆。期间禁止想KPI、周报、"老板那句话什么意思"——想也想不到答案。' },
+        { emoji: '📻', name: '宇宙电台（社会版）', dose: '失眠时调台', note: '收到平行宇宙的电台。节目内容：另一个你在做同样的工作，但工资是你的3倍。听完会更失眠——慎用。' }
       ]
     ],
     normal: [
       [
-        { emoji: '🛏️', name: '赖床自由权', dose: '每周1次 | 不设时限', note: '您精神状况良好，但赖床是人生基本乐趣之一。允许在床上吃早餐、刷手机、发呆——这是健康人的特权。' },
-        { emoji: '🍲', name: '庆祝火锅', dose: '每月1-2次 | 呼朋引伴', note: '庆祝您精神健康！多叫几个朋友，把本处方给他们看，让他们羡慕一下。' },
-        { emoji: '😊', name: '继续保持', dose: '长期坚持 | 无需调整', note: '您是我院的骄傲，是精神健康的标兵。请继续保持当前状态，如果哪天感觉不对劲了，欢迎随时回来复查。' }
+        { emoji: '🌟', name: '精神健康徽章（金款）', dose: '佩戴于胸口 | 长期', note: '社会人中的精神健康标兵。稀有度：传说级。注意：佩戴后可能被同事认为是"卷王"，请低调使用。' },
+        { emoji: '🎈', name: '多余情绪气球（大号）', dose: '开心时充1个', note: '比学生款大一倍，因为成年人的情绪也大。系好。难过时解开——如果气球还没飞走的话。它大概率飞走了。' },
+        { emoji: '🪴', name: '工位绿植同款盆栽', dose: '养1盆 | 偶尔浇水', note: '它的状态就是你的状态。叶子发黄=你该休息了，长新芽=你在进步，枯死了=你也快了。请重视预警。' }
       ],
       [
-        { emoji: '🏆', name: '精神健康标兵', dose: '无需治疗 | 建议定期维护', note: '恭喜！你是这个世界的稀有物种——精神健康的人。请继续保持，这个世界需要你这样的正常人。建议每半年复查一次。' },
-        { emoji: '📚', name: '阅读充电', dose: '每日30分钟 | 纸质书更佳', note: '不是治疗，是保养。像给车做保养一样，定期给大脑输入优质内容。推荐：小说、历史、科普——就是别看成功学。' },
-        { emoji: '🌞', name: '阳光补充', dose: '每日15分钟 | 户外最佳', note: '光合作用是人类的基本需求。晒太阳不仅补钙，还补心情。阴天也请出门，紫外线会穿透云层——科学说的。' }
+        { emoji: '🦔', name: '刺猬社交距离仪（PLUS）', dose: '聚会时佩戴', note: '想独处时长出刺，想社交时收起刺。社会人款多了"对老板自动竖刺"功能——请根据场合关闭。' },
+        { emoji: '🌙', name: '月亮许愿转发服务（VIP）', dose: '满月时1次', note: '愿望走VIP通道转发给月亮，比普通版快3天。但月亮不保证实现——VIP只是优先级，不是成功率。' },
+        { emoji: '📮', name: '退休前明信片', dose: '每年寄1张', note: '写给退休那年的自己。退休后你会收到，并发现——你现在担心的事一件都没发生，发生的都是你没担心的。' }
       ],
       [
-        { emoji: '💤', name: '美容觉', dose: '每日8小时 | 23:00前入睡', note: '皮肤好、心情好、精神好，一举三得。睡眠是上帝给人类最好的免费药，可惜很多人不吃。' },
-        { emoji: '🏃', name: '快乐运动', dose: '每周3次 | 选你喜欢的', note: '不是因为需要减肥，而是因为运动让人快乐。选一个你真正喜欢的运动——跳舞、打球、游泳，而不是在健身房痛苦地举铁。' },
-        { emoji: '❤️', name: '关爱他人', dose: '随时 | 量力而行', note: '你的精神健康已经是稀缺资源了。如果有多余的能量，可以分一点给身边精神内耗的朋友。但记住：先照顾好自己，再照顾别人。' }
+        { emoji: '🎨', name: '丑画释放贴（社会版）', dose: '每周1张 | 画老板', note: '画老板的丑画，画完撕掉。不许给任何人看，尤其是同事——隔墙有耳。这是唯一一个有保密协议的处方。' },
+        { emoji: '🐌', name: '人生进度条（躺平版）', dose: '长期使用', note: '别人的人生进度条是高铁，你的是树懒。但树懒也能到终点，而且不会猝死——这就是慢的意义。' },
+        { emoji: '🍀', name: '运气补给包（中号）', dose: '每月1包', note: '装着10次"刚好赶上地铁""周报没被点""请假一次通过"的小运气。社会人版比学生版贵3倍，但内容一样。' }
       ]
     ]
   },
   genius: [
     [
       { emoji: '🍼', name: '天才专属摸鱼套餐', dose: '每日1次 | 不限时长', note: '微积分都会了，摸个鱼怎么了？你值得拥有比普通小朋友更多的玩耍时间。' },
-      { emoji: '🧸', name: '奥特曼卡片', dose: '每周1包 | 不可间断', note: '研究表明，收集奥特曼卡片能显著提升儿童的逻辑推理能力。本处方基于严谨的科学研究（绝不是因为我小时候也喜欢）。' },
-      { emoji: '🎨', name: '涂鸦释放', dose: '每日1次 | 不限时长', note: '在纸上画，不要在墙上画。如果已经在墙上画了——恭喜你，你是一个有创造力的天才，但妈妈可能会生气。' },
-      { emoji: '🌟', name: '天才保护令', dose: '长期有效', note: '根据本处方，任何人不得以"学习"为名剥夺你的玩耍时间。请将此处方交给家长，告诉他们：这是医生说的。' }
+      { emoji: '🦄', name: '独角兽认证证书', dose: '终身有效', note: '证明你是独角兽级别的天才。可用来：拒绝做作业（"我都会了为什么还要做"）、要求加零食、和大人平起平坐。' },
+      { emoji: '🪄', name: '魔法棒使用权', dose: '想用就用', note: '你已证明智商，可以使用魔法棒。但只能把"作业"变成"游戏"——不能变零食，那是另一项天赋。' },
+      { emoji: '🌟', name: '天才保护令', dose: '长期有效', note: '任何人不得以"为你好"为名剥夺你的玩耍时间。请将此处方交给家长，告诉他们：这是医生说的。' }
     ]
   ]
 };
@@ -1655,7 +1797,12 @@ function getPrescription(score, isStudent, easterEggType) {
   if (easterEggType === 'preschool_genius') {
     pool = rxPools.genius;
   } else {
-    var group = isStudent ? 'student' : 'worker';
+    var group;
+    if (typeof userSubGroup !== 'undefined' && userSubGroup === 'preschool') {
+      group = 'preschool';
+    } else {
+      group = isStudent ? 'student' : 'worker';
+    }
     if (score >= 70) {
       pool = rxPools[group].severe;
     } else if (score >= 40) {
@@ -2030,6 +2177,15 @@ function launchLandscape() {
         particles.push(new Particle());
       }
       p.background(0, 0, 0, 0);
+    };
+
+    p.windowResized = function () {
+      if (!container) return;
+      var h = container.offsetHeight || 220;
+      p.resizeCanvas(container.offsetWidth, h);
+      cols = p.floor(p.width / scl);
+      rows = p.floor(p.height / scl);
+      flowField = new Array(cols * rows);
     };
 
     p.draw = function () {
